@@ -70,7 +70,7 @@ function Home(){
     `linear-gradient(135deg,hsl(35,20%,17%),hsl(28,16%,11%))`,
   ];
   const bgList = slides.length > 0 ? slides : fallbackBgs.map(bg=>({bg}));
-  useEffect(()=>{if(bgList.length>1){const t=setInterval(()=>setIdx(i=>(i+1)%bgList.length),5000);return()=>clearInterval(t)}},[bgList.length]);
+  useEffect(()=>{if(bgList.length>1){const t=setInterval(()=>setIdx(i=>(i+1)%bgList.length),4000);return()=>clearInterval(t)}},[bgList.length]);
   return(<div style={{position:"relative",width:"100%",height:"100vh",overflow:"hidden"}}>
     {bgList.map((s,i)=><div key={i} style={{position:"absolute",inset:0,background:s.imageUrl?`url(${s.imageUrl}) center/cover`:s.bg,opacity:idx===i?1:0,transition:"opacity 1.8s ease"}}/>)}
     <div style={{position:"absolute",inset:0,background:"rgba(30,30,30,0.42)"}}/>
