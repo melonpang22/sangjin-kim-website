@@ -61,7 +61,6 @@ function EmptyState({message}){
   return(<div style={{textAlign:"center",padding:"60px 0"}}><p style={{fontFamily:F.b,fontSize:14,color:C.dim}}>{message}</p></div>);
 }
  
-/* ═══ HOME (Sanity slides) ═══ */
 function Home(){
   const [idx,setIdx]=useState(0);
   const slides = useSanity(`*[_type=="homeSlide"]|order(order asc){"imageUrl":image.asset->url}`, []);
@@ -72,7 +71,6 @@ function Home(){
   ];
   const bgList = slides.length > 0 ? slides : fallbackBgs.map(bg=>({bg}));
   useEffect(()=>{if(bgList.length>1){const t=setInterval(()=>setIdx(i=>(i+1)%bgList.length),5000);return()=>clearInterval(t)}},[bgList.length]);
- 
   return(<div style={{position:"relative",width:"100%",height:"100vh",overflow:"hidden"}}>
     {bgList.map((s,i)=><div key={i} style={{position:"absolute",inset:0,background:s.imageUrl?`url(${s.imageUrl}) center/cover`:s.bg,opacity:idx===i?1:0,transition:"opacity 1.8s ease"}}/>)}
     <div style={{position:"absolute",inset:0,background:"rgba(30,30,30,0.42)"}}/>
@@ -93,7 +91,6 @@ function Home(){
   </div>);
 }
  
-/* ═══ BIOGRAPHY (Sanity only) ═══ */
 function Biography(){
   const [lang,setLang]=useState("KR");
   const bio = useSanity(`*[_type=="biography"][0]{korean,english,"photoUrl":profilePhoto.asset->url}`, null);
@@ -110,7 +107,6 @@ function Biography(){
   </>);
 }
  
-/* ═══ SCHEDULE (Sanity only) ═══ */
 function SchedulePage(){
   const raw = useSanity(`*[_type=="schedule"]|order(year desc, date desc){"id":_id,year,date,title,role,venue,conductor,director,link,"photoUrl":photo.asset->url}`, []);
   const yrs=[...new Set(raw.map(s=>s.year))].sort((a,b)=>b-a);
@@ -141,7 +137,6 @@ function SchedulePage(){
   </>);
 }
  
-/* ═══ VIDEO (Sanity only) ═══ */
 function VideoPage(){
   const raw = useSanity(`*[_type=="video"]{"id":_id,title,youtubeId}`, []);
   const [modal,setModal]=useState(null);
@@ -165,17 +160,30 @@ function VideoPage(){
   </>);
 }
  
-/* ═══ GALLERY (Sanity only) ═══ */
+/* ═══ GALLERY — REDESIGNED ═══ */
+function ArrowBtn({direction,onClick}){
+  return(<button onClick={onClick} style={{position:"absolute",top:"50%",transform:"translateY(-50%)",[direction==="left"?"left":"right"]:4,width:40,height:40,borderRadius:"50%",border:`1px solid ${C.gold}44`,background:"rgba(30,30,30,0.8)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",transition:"border-color 0.3s",zIndex:2,padding:0}} onMouseEnter={e=>e.currentTarget.style.borderColor=`${C.gold}aa`} onMouseLeave={e=>e.currentTarget.style.borderColor=`${C.gold}44`}>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={C.gold} strokeWidth="1.5" strokeLinecap="round"><path d={direction==="left"?"M15 18l-6-6 6-6":"M9 18l6-6-6-6"}/></svg>
+  </button>);
+}
+ 
 function GRow({label,items,tall}){
-  const ref=useRef(null);const [dr,setDr]=useState(false);const [sx,setSx]=useState(0);const [sl,setSl]=useState(0);const [lb,setLb]=useState(null);
+  const ref=useRef(null);
+  const [dr,setDr]=useState(false);const [sx,setSx]=useState(0);const [sl,setSl]=useState(0);const [lb,setLb]=useState(null);
   const dn=e=>{setDr(true);setSx(e.pageX||e.touches?.[0]?.pageX);setSl(ref.current.scrollLeft)};
   const mv=e=>{if(!dr)return;e.preventDefault();ref.current.scrollLeft=sl-((e.pageX||e.touches?.[0]?.pageX)-sx)};
   const up=()=>setDr(false);
+  const scrollBy=(dir)=>{if(ref.current)ref.current.scrollBy({left:dir*300,behavior:"smooth"})};
   if(items.length===0) return null;
-  return(<div style={{marginBottom:48}}>
-    <div style={{maxWidth:1000,margin:"0 auto",padding:"0 32px"}}><p style={{fontFamily:F.b,fontSize:12,letterSpacing:4,color:C.goldLight,marginBottom:16,fontWeight:500}}>{label}</p></div>
-    <div ref={ref} onMouseDown={dn} onMouseMove={mv} onMouseUp={up} onMouseLeave={up} onTouchStart={dn} onTouchMove={mv} onTouchEnd={up} style={{display:"flex",gap:16,overflowX:"auto",cursor:dr?"grabbing":"grab",scrollbarWidth:"none",userSelect:"none",WebkitUserSelect:"none",paddingLeft:32,paddingRight:32}}>
-      {items.map(it=><div key={it.id} onClick={()=>!dr&&setLb(it)} style={{minWidth:tall?220:280,height:tall?300:200,borderRadius:4,flexShrink:0,transition:"transform 0.3s",background:it.imageUrl?`url(${it.imageUrl}) center/cover`:`linear-gradient(135deg,hsl(25,15%,20%),hsl(30,12%,14%))`,border:`1px solid ${C.borderLight}`}} onMouseEnter={e=>e.currentTarget.style.transform="scale(1.02)"} onMouseLeave={e=>e.currentTarget.style.transform="scale(1)"}/>)}
+  return(<div style={{marginBottom:64}}>
+    <p style={{fontFamily:F.b,fontSize:15,letterSpacing:6,color:C.goldLight,marginBottom:24,fontWeight:500,textAlign:"center"}}>{label}</p>
+    <div style={{position:"relative",maxWidth:900,margin:"0 auto",padding:"0 52px"}}>
+      <ArrowBtn direction="left" onClick={()=>scrollBy(-1)}/>
+      <div ref={ref} onMouseDown={dn} onMouseMove={mv} onMouseUp={up} onMouseLeave={up} onTouchStart={dn} onTouchMove={mv} onTouchEnd={up}
+        style={{display:"flex",gap:14,overflowX:"auto",cursor:dr?"grabbing":"grab",scrollbarWidth:"none",userSelect:"none",WebkitUserSelect:"none",scrollBehavior:"smooth"}}>
+        {items.map(it=><div key={it.id} onClick={()=>!dr&&setLb(it)} style={{minWidth:tall?180:240,height:tall?250:170,borderRadius:4,flexShrink:0,transition:"transform 0.3s",background:it.imageUrl?`url(${it.imageUrl}) center/cover`:`linear-gradient(135deg,hsl(${it.hue||25},${it.sat||15}%,20%),hsl(${(it.hue||25)+10},${(it.sat||15)-3}%,14%))`,border:`1px solid ${C.borderLight}`}} onMouseEnter={e=>e.currentTarget.style.transform="scale(1.02)"} onMouseLeave={e=>e.currentTarget.style.transform="scale(1)"}/>)}
+      </div>
+      <ArrowBtn direction="right" onClick={()=>scrollBy(1)}/>
     </div>
     {lb&&<div onClick={()=>setLb(null)} style={{position:"fixed",inset:0,zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(0,0,0,0.7)",backdropFilter:"blur(14px)",cursor:"pointer"}}><div style={{width:"85%",maxWidth:750,height:"75vh",borderRadius:6,background:lb.imageUrl?`url(${lb.imageUrl}) center/cover`:`#1E1E1E`,border:`1px solid ${C.borderLight}`}}/></div>}
   </div>);
@@ -186,13 +194,12 @@ function GalleryPage(){
   const portraits = raw.filter(g=>g.category==="Portraits");
   const performance = raw.filter(g=>g.category==="Performance");
   return(<><SectionTitle title="Gallery"/><PhotoBanner {...BANNERS.Gallery}/>
-    <div style={{paddingTop:48,paddingBottom:80}}>
+    <div style={{paddingTop:56,paddingBottom:80}}>
       {raw.length>0?<><GRow label="PORTRAITS" items={portraits} tall/><GRow label="PERFORMANCE" items={performance}/></>:<EmptyState message="Add photos in Sanity Studio"/>}
     </div>
   </>);
 }
  
-/* ═══ NEWS (Sanity only) ═══ */
 function NewsPage(){
   const raw = useSanity(`*[_type=="news"]|order(date desc){"id":_id,title,source,date,summary,link,"thumbnailUrl":thumbnail.asset->url}`, []);
   const [pg,setPg]=useState(1);const pp=5;const tp=Math.ceil(raw.length/pp);const it=raw.slice((pg-1)*pp,pg*pp);
@@ -200,7 +207,7 @@ function NewsPage(){
     <div style={{maxWidth:1000,margin:"0 auto",padding:"48px 32px 80px"}}>
       {it.length>0?<>{it.map((n,i)=><div key={n.id}>
         <div className="nr" style={{display:"flex",gap:40,alignItems:"center",flexDirection:i%2===0?"row":"row-reverse"}}>
-          <div className="ni" style={{width:380,minWidth:380,height:220,borderRadius:4,flexShrink:0,background:n.thumbnailUrl?`url(${n.thumbnailUrl}) center/cover`:`linear-gradient(135deg,hsl(210,14%,20%),hsl(220,10%,14%))`,border:`1px solid ${C.borderLight}`}}/>
+          <div className="ni" style={{width:380,minWidth:380,height:220,borderRadius:4,flexShrink:0,background:n.thumbnailUrl?`url(${n.thumbnailUrl}) center/cover`:`linear-gradient(135deg,hsl(${n.hue||210},14%,20%),hsl(${(n.hue||210)+10},10%,14%))`,border:`1px solid ${C.borderLight}`}}/>
           <div style={{flex:1}}>
             <p style={{fontFamily:F.b,fontSize:12,color:C.dim,margin:"0 0 8px",letterSpacing:1}}>{n.source} &middot; {new Date(n.date).toLocaleDateString("en-US",{year:"numeric",month:"short",day:"numeric"})}</p>
             <h3 style={{fontFamily:F.d,fontSize:24,color:C.text,margin:"0 0 14px",fontWeight:400,lineHeight:1.35}}>{n.title}</h3>
@@ -219,11 +226,9 @@ function NewsPage(){
   </>);
 }
  
-/* ═══ CONTACT ═══ */
 function ContactPage(){
   const [status,setStatus]=useState("idle");
   const [error,setError]=useState("");
-  useEffect(()=>{const id=setTimeout(()=>{if(window.grecaptcha&&document.getElementById("recaptcha-box")){try{window.grecaptcha.render("recaptcha-box",{sitekey:"6LckGrUsAAAAAQaa9WghuOdhP985MTJSAU-ytZY",theme:"dark"})}catch(e){}}},1000);return()=>clearTimeout(id)},[]);
   const handleSubmit=async(e)=>{
     e.preventDefault();setStatus("sending");setError("");
     try{const res=await fetch("https://formspree.io/f/mnjlaebo",{method:"POST",body:new FormData(e.target),headers:{"Accept":"application/json"}});
@@ -242,7 +247,7 @@ function ContactPage(){
         </div>
         <div style={{marginBottom:24}}><label style={{fontFamily:F.b,fontSize:10,color:C.goldLight,letterSpacing:2.5,display:"block",marginBottom:10}}>E-MAIL</label><input name="email" type="email" required style={iS} onFocus={e=>e.target.style.borderColor=C.gold} onBlur={e=>e.target.style.borderColor=C.border}/></div>
         <div style={{marginBottom:24}}><label style={{fontFamily:F.b,fontSize:10,color:C.goldLight,letterSpacing:2.5,display:"block",marginBottom:10}}>MESSAGE</label><textarea name="message" rows={6} required style={{...iS,resize:"vertical"}} onFocus={e=>e.target.style.borderColor=C.gold} onBlur={e=>e.target.style.borderColor=C.border}/></div>
-        <div id="recaptcha-box" style={{marginBottom:24}}></div>
+        <input type="text" name="_gotcha" style={{display:"none"}} tabIndex="-1" autoComplete="off"/>
         {error&&<p style={{fontFamily:F.b,fontSize:13,color:"#E24B4A",marginBottom:16}}>{error}</p>}
         <button type="submit" disabled={status==="sending"} style={{padding:"16px 44px",background:status==="sending"?C.dim:C.gold,border:"none",borderRadius:4,color:C.bg,fontFamily:F.b,fontSize:12,fontWeight:600,letterSpacing:2.5,cursor:status==="sending"?"not-allowed":"pointer",transition:"opacity 0.3s"}} onMouseEnter={e=>{if(status!=="sending")e.currentTarget.style.opacity="0.85"}} onMouseLeave={e=>e.currentTarget.style.opacity="1"}>{status==="sending"?"SENDING...":"SEND MESSAGE"}</button>
       </form>}
@@ -260,7 +265,6 @@ export default function App(){
   const go=useCallback(p=>{setPage(p);window.scrollTo(0,0)},[]);
   return(<div style={{background:C.bg,minHeight:"100vh"}}>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-    <script src="https://www.google.com/recaptcha/api.js?render=explicit" async defer></script>
     <Nav current={page} go={go} scrolled={page!=="Home"||scrolled}/>
     {page==="Home"&&<Home/>}
     {page==="Biography"&&<Biography/>}
@@ -272,4 +276,3 @@ export default function App(){
     {page!=="Home"&&<Footer/>}
   </div>);
 }
- 
