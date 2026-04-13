@@ -32,7 +32,7 @@ function Nav({current,go,scrolled}){
   const [open,setOpen]=useState(false);
   return(
     <nav style={{position:"fixed",top:0,left:0,right:0,zIndex:100,background:scrolled?"rgba(30,30,30,0.92)":"transparent",backdropFilter:scrolled?"blur(16px)":"none",borderBottom:scrolled?`1px solid ${C.border}`:"none",transition:"all 0.5s"}}>
-      <div style={{maxWidth:1400,margin:"0 auto",padding:"0 48px",display:"flex",alignItems:"center",justifyContent:"space-between",height:68}}>
+      <div style={{maxWidth:1400,margin:"0 auto",padding:"0 48px",display:"flex",alignItems:"center",justifyContent:"space-between",height:78}}>
         <button onClick={()=>go("Home")} style={{background:"none",border:"none",cursor:"pointer",padding:0}}><span style={{fontFamily:F.d,fontSize:26,fontWeight:600,color:C.gold,letterSpacing:4}}>JIN</span></button>
         <div className="dnv" style={{display:"flex",gap:16}}>{PAGES.filter(p=>p!=="Home").map(p=><button key={p} onClick={()=>go(p)} style={{background:current===p?`${C.gold}18`:"none",border:"none",cursor:"pointer",padding:"8px 22px",borderRadius:4,color:current===p?C.gold:C.muted,fontSize:13,fontFamily:F.b,fontWeight:500,letterSpacing:3,textTransform:"uppercase",transition:"all 0.3s"}}>{p}</button>)}</div>
         <button className="mbn" onClick={()=>setOpen(!open)} style={{display:"none",background:"none",border:"none",cursor:"pointer",color:C.gold,fontSize:22,padding:8}}>{open?"\u2715":"\u2630"}</button>
@@ -51,7 +51,7 @@ function PhotoBanner({hue,quote}){
 }
  
 function SectionTitle({title}){
-  return(<div style={{padding:"120px 0 0",maxWidth:1000,margin:"0 auto",paddingLeft:32,paddingRight:32}}>
+  return(<div style={{padding:"140px 0 0",maxWidth:1000,margin:"0 auto",paddingLeft:32,paddingRight:32}}>
     <span style={{fontFamily:F.b,fontSize:12,letterSpacing:6,color:C.gold,fontWeight:500,textTransform:"uppercase"}}>{title}</span>
     <div style={{width:40,height:1.5,background:C.gold,marginTop:12,opacity:0.6}}/>
   </div>);
@@ -98,7 +98,7 @@ function Biography(){
   return(<><SectionTitle title="Biography"/><PhotoBanner {...BANNERS.Biography}/>
     <div style={{maxWidth:1000,margin:"0 auto",padding:"48px 32px 80px"}}>
       <div style={{display:"flex",gap:8,marginBottom:40}}>{["KR","EN"].map(l=><button key={l} onClick={()=>setLang(l)} style={{padding:"10px 24px",borderRadius:4,cursor:"pointer",fontSize:11,fontFamily:F.b,fontWeight:600,letterSpacing:1.5,transition:"all 0.3s",background:lang===l?`${C.gold}22`:"transparent",border:`1px solid ${lang===l?C.gold:C.border}`,color:lang===l?C.gold:C.muted}}>{l==="KR"?"KOREAN":"ENGLISH"}</button>)}</div>
-      {text?<div className="bl" style={{display:"flex",gap:56,alignItems:"flex-start"}}>
+      {text?<div className="bl" style={{display:"flex",gap:80,alignItems:"flex-start"}}>
         <div style={{flex:1}}>{text.split("\n\n").map((p,i)=><p key={`${lang}-${i}`} style={{fontFamily:F.b,fontSize:16,lineHeight:2,color:C.text,margin:"0 0 24px"}}>{p}</p>)}</div>
         <div className="bp" style={{width:520,minWidth:520,height:720,borderRadius:4,background:bio.photoUrl?`url(${bio.photoUrl}) center/cover`:`linear-gradient(160deg,hsl(30,15%,22%),hsl(25,12%,16%))`,border:`1px solid ${C.borderLight}`,position:"sticky",top:100,display:"flex",alignItems:"center",justifyContent:"center"}}>{!bio.photoUrl&&<span style={{fontFamily:F.b,fontSize:12,color:C.dim,letterSpacing:2}}>PROFILE PHOTO</span>}</div>
       </div>:<EmptyState message="Add biography content in Sanity Studio"/>}
