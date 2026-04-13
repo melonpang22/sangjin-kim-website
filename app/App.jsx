@@ -57,7 +57,7 @@ function Nav({current,go,scrolled}){
     <nav style={{position:"fixed",top:0,left:0,right:0,zIndex:100,background:scrolled?"rgba(30,30,30,0.92)":"transparent",backdropFilter:scrolled?"blur(16px)":"none",borderBottom:scrolled?`1px solid ${C.border}`:"none",transition:"all 0.5s"}}>
       <div style={{maxWidth:1200,margin:"0 auto",padding:"0 32px",display:"flex",alignItems:"center",justifyContent:"space-between",height:68}}>
         <button onClick={()=>go("Home")} style={{background:"none",border:"none",cursor:"pointer",padding:0}}><span style={{fontFamily:F.d,fontSize:20,fontWeight:600,color:C.gold,letterSpacing:3}}>JIN</span></button>
-        <div className="dnv" style={{display:"flex",gap:8}}>{PAGES.filter(p=>p!=="Home").map(p=><button key={p} onClick={()=>go(p)} style={{background:current===p?`${C.gold}18`:"none",border:"none",cursor:"pointer",padding:"8px 16px",borderRadius:4,color:current===p?C.gold:C.muted,fontSize:11,fontFamily:F.b,fontWeight:500,letterSpacing:1.5,textTransform:"uppercase",transition:"all 0.3s"}}>{p}</button>)}</div>
+        <div className="dnv" style={{display:"flex",gap:16}}>{PAGES.filter(p=>p!=="Home").map(p=><button key={p} onClick={()=>go(p)} style={{background:current===p?`${C.gold}18`:"none",border:"none",cursor:"pointer",padding:"8px 22px",borderRadius:4,color:current===p?C.gold:C.muted,fontSize:13,fontFamily:F.b,fontWeight:500,letterSpacing:3,textTransform:"uppercase",transition:"all 0.3s"}}>{p}</button>)}</div>
         <button className="mbn" onClick={()=>setOpen(!open)} style={{display:"none",background:"none",border:"none",cursor:"pointer",color:C.gold,fontSize:22,padding:8}}>{open?"\u2715":"\u2630"}</button>
       </div>
       {open&&<div style={{background:"rgba(30,30,30,0.98)",padding:"8px 32px 24px",borderTop:`1px solid ${C.border}`}}>{PAGES.map(p=><button key={p} onClick={()=>{go(p);setOpen(false)}} style={{display:"block",width:"100%",textAlign:"left",padding:"14px 0",background:"none",border:"none",cursor:"pointer",color:current===p?C.gold:C.muted,fontSize:14,fontFamily:F.b,fontWeight:500,borderBottom:`1px solid ${C.border}`}}>{p}</button>)}</div>}
@@ -208,21 +208,40 @@ function NewsPage(){
 }
  
 function ContactPage(){
-  const [sent,setSent]=useState(false);
+  const [status,setStatus]=useState("idle");
+  const [error,setError]=useState("");
+ 
+  const handleSubmit=async(e)=>{
+    e.preventDefault();
+    setStatus("sending");
+    setError("");
+    try{
+      const res=await fetch("https://formspree.io/f/mnjlaebo",{
+        method:"POST",
+        body:new FormData(e.target),
+        headers:{"Accept":"application/json"},
+      });
+      if(res.ok){setStatus("sent")}
+      else{setStatus("idle");setError("Failed to send. Please try again.")}
+    }catch(err){setStatus("idle");setError("Network error. Please try again.")}
+  };
+ 
   const iS={width:"100%",padding:"14px 18px",background:"transparent",border:`1px solid ${C.border}`,borderRadius:4,color:C.text,fontFamily:F.b,fontSize:15,outline:"none",transition:"border-color 0.3s",boxSizing:"border-box"};
   return(<><SectionTitle title="Contact"/><PhotoBanner {...BANNERS.Contact}/>
     <div style={{maxWidth:1000,margin:"0 auto",padding:"48px 32px 80px"}}>
       <p style={{fontFamily:F.b,fontSize:16,color:C.muted,marginBottom:40,lineHeight:1.8,maxWidth:550}}>For inquiries regarding performances, collaborations, or management, please fill out the form below.</p>
-      {sent?<div style={{textAlign:"center",padding:"80px 0"}}><p style={{fontFamily:F.d,fontSize:32,color:C.gold,marginBottom:14}}>Thank you</p><p style={{fontFamily:F.b,fontSize:15,color:C.muted}}>Your message has been sent successfully.</p></div>:
-      <div style={{maxWidth:640}}>
+      {status==="sent"?<div style={{textAlign:"center",padding:"80px 0"}}><p style={{fontFamily:F.d,fontSize:32,color:C.gold,marginBottom:14}}>Thank you</p><p style={{fontFamily:F.b,fontSize:15,color:C.muted}}>Your message has been sent successfully.</p></div>:
+      <form onSubmit={handleSubmit} style={{maxWidth:640}}>
         <div className="cr" style={{display:"flex",gap:20,marginBottom:24}}>
-          <div style={{flex:1}}><label style={{fontFamily:F.b,fontSize:10,color:C.goldLight,letterSpacing:2.5,display:"block",marginBottom:10}}>FIRST NAME</label><input style={iS} onFocus={e=>e.target.style.borderColor=C.gold} onBlur={e=>e.target.style.borderColor=C.border}/></div>
-          <div style={{flex:1}}><label style={{fontFamily:F.b,fontSize:10,color:C.goldLight,letterSpacing:2.5,display:"block",marginBottom:10}}>LAST NAME</label><input style={iS} onFocus={e=>e.target.style.borderColor=C.gold} onBlur={e=>e.target.style.borderColor=C.border}/></div>
+          <div style={{flex:1}}><label style={{fontFamily:F.b,fontSize:10,color:C.goldLight,letterSpacing:2.5,display:"block",marginBottom:10}}>FIRST NAME</label><input name="firstName" required style={iS} onFocus={e=>e.target.style.borderColor=C.gold} onBlur={e=>e.target.style.borderColor=C.border}/></div>
+          <div style={{flex:1}}><label style={{fontFamily:F.b,fontSize:10,color:C.goldLight,letterSpacing:2.5,display:"block",marginBottom:10}}>LAST NAME</label><input name="lastName" required style={iS} onFocus={e=>e.target.style.borderColor=C.gold} onBlur={e=>e.target.style.borderColor=C.border}/></div>
         </div>
-        <div style={{marginBottom:24}}><label style={{fontFamily:F.b,fontSize:10,color:C.goldLight,letterSpacing:2.5,display:"block",marginBottom:10}}>E-MAIL</label><input type="email" style={iS} onFocus={e=>e.target.style.borderColor=C.gold} onBlur={e=>e.target.style.borderColor=C.border}/></div>
-        <div style={{marginBottom:32}}><label style={{fontFamily:F.b,fontSize:10,color:C.goldLight,letterSpacing:2.5,display:"block",marginBottom:10}}>MESSAGE</label><textarea rows={6} style={{...iS,resize:"vertical"}} onFocus={e=>e.target.style.borderColor=C.gold} onBlur={e=>e.target.style.borderColor=C.border}/></div>
-        <button onClick={()=>setSent(true)} style={{padding:"16px 44px",background:C.gold,border:"none",borderRadius:4,color:C.bg,fontFamily:F.b,fontSize:12,fontWeight:600,letterSpacing:2.5,cursor:"pointer",transition:"opacity 0.3s"}} onMouseEnter={e=>e.currentTarget.style.opacity="0.85"} onMouseLeave={e=>e.currentTarget.style.opacity="1"}>SEND MESSAGE</button>
-      </div>}
+        <div style={{marginBottom:24}}><label style={{fontFamily:F.b,fontSize:10,color:C.goldLight,letterSpacing:2.5,display:"block",marginBottom:10}}>E-MAIL</label><input name="email" type="email" required style={iS} onFocus={e=>e.target.style.borderColor=C.gold} onBlur={e=>e.target.style.borderColor=C.border}/></div>
+        <div style={{marginBottom:24}}><label style={{fontFamily:F.b,fontSize:10,color:C.goldLight,letterSpacing:2.5,display:"block",marginBottom:10}}>MESSAGE</label><textarea name="message" rows={6} required style={{...iS,resize:"vertical"}} onFocus={e=>e.target.style.borderColor=C.gold} onBlur={e=>e.target.style.borderColor=C.border}/></div>
+        <div style={{marginBottom:24}}><div className="g-recaptcha" data-sitekey="6Lcj_7QsAAAAAFE42loYCSOULquNbgHgOlxoG5lt"></div></div>
+        {error&&<p style={{fontFamily:F.b,fontSize:13,color:"#E24B4A",marginBottom:16}}>{error}</p>}
+        <button type="submit" disabled={status==="sending"} style={{padding:"16px 44px",background:status==="sending"?C.dim:C.gold,border:"none",borderRadius:4,color:C.bg,fontFamily:F.b,fontSize:12,fontWeight:600,letterSpacing:2.5,cursor:status==="sending"?"not-allowed":"pointer",transition:"opacity 0.3s"}} onMouseEnter={e=>{if(status!=="sending")e.currentTarget.style.opacity="0.85"}} onMouseLeave={e=>e.currentTarget.style.opacity="1"}>{status==="sending"?"SENDING...":"SEND MESSAGE"}</button>
+      </form>}
     </div>
     <style>{`@media(max-width:640px){.cr{flex-direction:column!important}}`}</style>
   </>);
@@ -234,6 +253,7 @@ export default function App(){
   const [page,setPage]=useState("Home");
   const [scrolled,setScrolled]=useState(false);
   useEffect(()=>{const h=()=>setScrolled(window.scrollY>40);window.addEventListener("scroll",h);return()=>window.removeEventListener("scroll",h)},[]);
+  useEffect(()=>{const s=document.createElement("script");s.src="https://www.google.com/recaptcha/api.js";s.async=true;s.defer=true;document.head.appendChild(s);return()=>{try{document.head.removeChild(s)}catch(e){}}},[]);
   const go=useCallback(p=>{setPage(p);window.scrollTo(0,0)},[]);
   return(<div style={{background:C.bg,minHeight:"100vh"}}>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet"/>
