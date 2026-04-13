@@ -223,7 +223,7 @@ function NewsPage(){
 function ContactPage(){
   const [status,setStatus]=useState("idle");
   const [error,setError]=useState("");
-  useEffect(()=>{const id=setTimeout(()=>{if(window.grecaptcha&&document.getElementById("recaptcha-box")){try{window.grecaptcha.render("recaptcha-box",{sitekey:"6Lcj_7QsAAAAAFE42loYCSOULquNbgHgOlxoG5lt",theme:"dark"})}catch(e){}}},1000);return()=>clearTimeout(id)},[]);
+  useEffect(()=>{const id=setTimeout(()=>{if(window.grecaptcha&&document.getElementById("recaptcha-box")){try{window.grecaptcha.render("recaptcha-box",{sitekey:"6LckGrUsAAAAAQaa9WghuOdhP985MTJSAU-ytZY",theme:"dark"})}catch(e){}}},1000);return()=>clearTimeout(id)},[]);
   const handleSubmit=async(e)=>{
     e.preventDefault();setStatus("sending");setError("");
     try{const res=await fetch("https://formspree.io/f/mnjlaebo",{method:"POST",body:new FormData(e.target),headers:{"Accept":"application/json"}});
