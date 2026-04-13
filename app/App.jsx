@@ -177,7 +177,7 @@ function GRow({label,items,tall}){
   if(items.length===0) return null;
   return(<div style={{marginBottom:64}}>
     <p style={{fontFamily:F.b,fontSize:15,letterSpacing:6,color:C.goldLight,marginBottom:24,fontWeight:500,textAlign:"center"}}>{label}</p>
-    <div style={{position:"relative",maxWidth:900,margin:"0 auto",padding:"0 52px"}}>
+    <div style={{position:"relative",maxWidth:1200,margin:"0 auto",padding:"0 52px"}}>
       <ArrowBtn direction="left" onClick={()=>scrollBy(-1)}/>
       <div ref={ref} onMouseDown={dn} onMouseMove={mv} onMouseUp={up} onMouseLeave={up} onTouchStart={dn} onTouchMove={mv} onTouchEnd={up}
         style={{display:"flex",gap:14,overflowX:"auto",cursor:dr?"grabbing":"grab",scrollbarWidth:"none",userSelect:"none",WebkitUserSelect:"none",scrollBehavior:"smooth"}}>
