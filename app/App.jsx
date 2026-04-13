@@ -1,0 +1,251 @@
+import { useState, useEffect, useRef, useCallback } from "react";
+ 
+const C = {
+  bg: "#1E1E1E", surface: "#2A2A2A", surfaceAlt: "#232323",
+  border: "#3A3A38", borderLight: "#4A4A45",
+  gold: "#B8A472", goldLight: "#D4CFC0", goldDim: "#8A7D5A",
+  text: "#E8E3D8", muted: "#9A9590", dim: "#6A6560",
+};
+const F = { d: "'Cormorant Garamond',Georgia,serif", b: "'Montserrat','Helvetica Neue',sans-serif" };
+ 
+const PAGES = ["Home","Biography","Schedule","Video","Gallery","News","Contact"];
+ 
+const SCHEDULE = [
+  { id:1, year:2026, date:"7, 13, 22 September 2026", title:"Il Barbiere di Siviglia", role:"Don Basilio", venue:"Berlin Staatsoper", conductor:"Leonardo Sini", director:"Ruth Berghaus", link:"#" },
+  { id:2, year:2026, date:"28, 31 October / 3, 5 November 2026", title:"Das Rheingold", role:"Fasolt", venue:"Teatro alla Scala", conductor:"Christian Thielemann", director:"David McVicar", link:"#" },
+  { id:3, year:2026, date:"19, 20, 21 December 2026", title:"Beethoven: Symphony No.9", role:"Bass Soloist", venue:"Seoul Lotte Concert Hall", conductor:"Jaap van Zweden", link:"#" },
+  { id:4, year:2025, date:"11, 15, 18, 22, 25 January 2025", title:"La Boheme", role:"Colline", venue:"The Metropolitan Opera", conductor:"Kensho Watanabe", link:"#" },
+  { id:5, year:2025, date:"25 July / 2, 5, 11, 14, 19, 22 August 2025", title:"Die Meistersinger von Nurnberg", role:"Pogner", venue:"Bayreuther Festspiele", conductor:"Daniele Gatti", link:"#" },
+  { id:6, year:2024, date:"14 March 2024", title:"Verdi: Requiem", role:"Bass Soloist", venue:"Seoul Arts Center", conductor:"David Yi", link:"#" },
+];
+const VIDEOS = [
+  { id:1, title:"Verdi: Aida — Ramfis", ytId:"mGVTh9cno_U" },
+  { id:2, title:"Donizetti: Lucia di Lammermoor", ytId:"r2_oJTnVbG0" },
+  { id:3, title:"Bellini: I Puritani", ytId:"R_xo8cena2o" },
+  { id:4, title:"Verdi: Rigoletto — Sparafucile", ytId:"VFpPfub57B4" },
+  { id:5, title:"Wagner: Die Walkure — Hunding", ytId:"q4Pn55qa1e8" },
+  { id:6, title:"Beethoven: Symphony No.9", ytId:"gb2pqPhMKxA" },
+];
+const GP = Array.from({length:8},(_,i)=>({id:`p${i}`,hue:[25,35,30,20,40,28,33,22][i],sat:[15,12,18,14,10,16,13,17][i]}));
+const GS = Array.from({length:8},(_,i)=>({id:`s${i}`,hue:[210,220,200,240,215,230,205,225][i],sat:[18,15,20,12,16,14,19,13][i]}));
+const NEWS = [
+  { id:1, title:"A commanding Fasolt at Teatro alla Scala", source:"The Guardian", date:"2026-01-20", summary:"Kim's rich, cavernous bass filled the auditorium with warmth and authority that made Fasolt's tragic fate genuinely moving.", link:"#", hue:30 },
+  { id:2, title:"Ein Pogner von seltener Klasse", source:"Opernwelt", date:"2025-12-05", summary:"Sein Bass durchdringt muhelos den Raum und verleiht der Figur eine tiefgrundige Wurde, die selten zu erleben ist.", link:"#", hue:220 },
+  { id:3, title:"Colline d'une noblesse rare", source:"Le Monde", date:"2025-10-15", summary:"Une incarnation magistrale du philosophe, portee par un timbre somptueux et une presence scenique remarquable.", link:"#", hue:35 },
+  { id:4, title:"Vodnik mit gottlicher Resonanz", source:"Suddeutsche Zeitung", date:"2025-06-22", summary:"Kim bringt eine Warme und Erhabenheit in die Rolle des Wassermanns, die selten zu erleben ist.", link:"#", hue:200 },
+  { id:5, title:"A Basilio full of charm", source:"Financial Times", date:"2025-03-10", summary:"Kim brought irresistible comic timing alongside his magnificent bass, making Don Basilio a highlight.", link:"#", hue:25 },
+  { id:6, title:"Un Requiem di rara potenza", source:"Corriere della Sera", date:"2024-11-28", summary:"La voce di Kim e un fenomeno naturale: profonda, vellutata e infinitamente espressiva.", link:"#", hue:215 },
+  { id:7, title:"Masterful Symphony No.9", source:"The Times", date:"2024-09-15", summary:"Kim's contribution to the finale was nothing short of electrifying, his bass providing the foundation.", link:"#", hue:32 },
+  { id:8, title:"Outstanding debut at Bayreuth", source:"Die Welt", date:"2024-07-30", summary:"Ein beeindruckendes Debut bei den Bayreuther Festspielen mit naturlicher Autoritat.", link:"#", hue:210 },
+];
+const BIO = {
+  KR: "바리톤 김상진은 깊고 풍부한 음색과 설득력 있는 무대 연기로 세계 주요 오페라 하우스에서 활발히 활동하고 있습니다.\n\n서울대학교와 베를린 한스 아이슬러 음대를 졸업한 후, 빈 국립오페라, 바이에른 국립오페라, 로열 오페라 하우스, 테아트로 알라 스칼라, 파리 국립오페라, 잘츠부르크 페스티벌 등 세계 정상급 무대에서 주역으로 활동해왔습니다.\n\n모차르트의 사라스트로와 피가로, 베르디의 필리포 2세와 피에스코, 바그너의 구르네만츠와 마르케 왕 등 폭넓은 레퍼토리를 소화하며, 베르디 레퀴엠, 베토벤 교향곡 9번 등 콘서트 무대에서도 깊은 인상을 남기고 있습니다.",
+  EN: "Acclaimed as one of the most compelling baritones of his generation, Sangjin Kim has captivated audiences at the world's leading opera houses with his rich, resonant voice and commanding stage presence.\n\nA graduate of Seoul National University and the Hochschule fur Musik Hanns Eisler Berlin, he has performed principal roles at the Wiener Staatsoper, Bayerische Staatsoper, Royal Opera House, Teatro alla Scala, and the Salzburg Festival.\n\nHis repertoire spans from Mozart's Sarastro to Verdi's Filippo II, Wagner's Gurnemanz and King Marke. He is equally celebrated on the concert platform with Verdi's Requiem and Beethoven's Ninth Symphony.",
+};
+const BANNERS = {
+  Biography:{hue:220,quote:"The stage is not merely a place to sing, but a world to inhabit."},
+  Schedule:{hue:35,quote:"Every note carries a lifetime of emotion."},
+  Video:{hue:200,quote:"Music speaks what words cannot express."},
+  Gallery:{hue:30,quote:"To stand on stage is to share one's soul with the world."},
+  News:{hue:215,quote:"Art is the bridge between silence and meaning."},
+  Contact:{hue:25,quote:"I look forward to hearing from you."},
+};
+ 
+function Nav({current,go,scrolled}){
+  const [open,setOpen]=useState(false);
+  return(
+    <nav style={{position:"fixed",top:0,left:0,right:0,zIndex:100,background:scrolled?"rgba(30,30,30,0.92)":"transparent",backdropFilter:scrolled?"blur(16px)":"none",borderBottom:scrolled?`1px solid ${C.border}`:"none",transition:"all 0.5s"}}>
+      <div style={{maxWidth:1200,margin:"0 auto",padding:"0 32px",display:"flex",alignItems:"center",justifyContent:"space-between",height:68}}>
+        <button onClick={()=>go("Home")} style={{background:"none",border:"none",cursor:"pointer",padding:0}}><span style={{fontFamily:F.d,fontSize:20,fontWeight:600,color:C.gold,letterSpacing:3}}>JIN</span></button>
+        <div className="dnv" style={{display:"flex",gap:8}}>{PAGES.filter(p=>p!=="Home").map(p=><button key={p} onClick={()=>go(p)} style={{background:current===p?`${C.gold}18`:"none",border:"none",cursor:"pointer",padding:"8px 16px",borderRadius:4,color:current===p?C.gold:C.muted,fontSize:11,fontFamily:F.b,fontWeight:500,letterSpacing:1.5,textTransform:"uppercase",transition:"all 0.3s"}}>{p}</button>)}</div>
+        <button className="mbn" onClick={()=>setOpen(!open)} style={{display:"none",background:"none",border:"none",cursor:"pointer",color:C.gold,fontSize:22,padding:8}}>{open?"\u2715":"\u2630"}</button>
+      </div>
+      {open&&<div style={{background:"rgba(30,30,30,0.98)",padding:"8px 32px 24px",borderTop:`1px solid ${C.border}`}}>{PAGES.map(p=><button key={p} onClick={()=>{go(p);setOpen(false)}} style={{display:"block",width:"100%",textAlign:"left",padding:"14px 0",background:"none",border:"none",cursor:"pointer",color:current===p?C.gold:C.muted,fontSize:14,fontFamily:F.b,fontWeight:500,borderBottom:`1px solid ${C.border}`}}>{p}</button>)}</div>}
+      <style>{`@media(max-width:768px){.dnv{display:none!important}.mbn{display:block!important}}`}</style>
+    </nav>
+  );
+}
+ 
+function PhotoBanner({hue,quote}){
+  return(<div style={{position:"relative",width:"100%",height:280,display:"flex",alignItems:"center",justifyContent:"center",background:`linear-gradient(135deg,hsl(${hue},14%,19%),hsl(${hue+10},10%,13%))`,overflow:"hidden"}}>
+    <div style={{position:"absolute",inset:0,background:"rgba(30,30,30,0.45)"}}/>
+    <p style={{position:"relative",zIndex:1,fontFamily:F.d,fontSize:"clamp(18px,2.5vw,26px)",fontStyle:"italic",color:`${C.text}aa`,textAlign:"center",padding:"0 60px",lineHeight:1.7,letterSpacing:0.5,maxWidth:700}}>"{quote}"</p>
+  </div>);
+}
+ 
+function SectionTitle({title}){
+  return(<div style={{padding:"60px 0 0",maxWidth:1000,margin:"0 auto",paddingLeft:32,paddingRight:32}}>
+    <span style={{fontFamily:F.b,fontSize:12,letterSpacing:6,color:C.gold,fontWeight:500,textTransform:"uppercase"}}>{title}</span>
+    <div style={{width:40,height:1.5,background:C.gold,marginTop:12,opacity:0.6}}/>
+  </div>);
+}
+ 
+function Home(){
+  const [idx,setIdx]=useState(0);
+  const sl=[{bg:`linear-gradient(135deg,hsl(25,18%,18%),hsl(30,15%,12%))`},{bg:`linear-gradient(135deg,hsl(220,15%,16%),hsl(210,12%,10%))`},{bg:`linear-gradient(135deg,hsl(35,20%,17%),hsl(28,16%,11%))`}];
+  useEffect(()=>{const t=setInterval(()=>setIdx(i=>(i+1)%sl.length),5000);return()=>clearInterval(t)},[]);
+  return(<div style={{position:"relative",width:"100%",height:"100vh",overflow:"hidden"}}>
+    {sl.map((s,i)=><div key={i} style={{position:"absolute",inset:0,background:s.bg,opacity:idx===i?1:0,transition:"opacity 1.8s ease"}}/>)}
+    <div style={{position:"absolute",inset:0,background:"rgba(30,30,30,0.42)"}}/>
+    <div style={{position:"relative",zIndex:2,height:"100%",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",textAlign:"center",padding:"0 24px"}}>
+      <div style={{fontSize:14,fontFamily:F.b,letterSpacing:7,color:C.gold,opacity:0.85,marginBottom:18,fontWeight:500}}>BARITONE</div>
+      <h1 style={{fontFamily:F.d,fontSize:"clamp(40px,9vw,72px)",fontWeight:300,color:C.text,margin:0,letterSpacing:4,lineHeight:1.15}}>Sangjin Kim</h1>
+      <div style={{width:56,height:1,background:C.gold,opacity:0.4,margin:"28px 0"}}/>
+      <div style={{display:"flex",gap:8,marginTop:8}}>{sl.map((_,i)=><button key={i} onClick={()=>setIdx(i)} style={{width:idx===i?22:6,height:6,borderRadius:3,border:"none",cursor:"pointer",background:idx===i?`${C.gold}99`:`${C.text}33`,transition:"all 0.4s",padding:0}}/>)}</div>
+    </div>
+    <div style={{position:"absolute",bottom:36,left:0,right:0,zIndex:3,display:"flex",justifyContent:"center",gap:18}}>
+      {[{l:"Instagram",h:"https://www.instagram.com/jin_kisa/",p:"M7.8,2H16.2C19.4,2,22,4.6,22,7.8V16.2A5.8,5.8,0,0,1,16.2,22H7.8C4.6,22,2,19.4,2,16.2V7.8A5.8,5.8,0,0,1,7.8,2M7.6,4A3.6,3.6,0,0,0,4,7.6V16.4A3.6,3.6,0,0,0,7.6,20H16.4A3.6,3.6,0,0,0,20,16.4V7.6A3.6,3.6,0,0,0,16.4,4H7.6M17.25,5.5A1.25,1.25,0,1,1,16,6.75A1.25,1.25,0,0,1,17.25,5.5M12,7A5,5,0,1,1,7,12A5,5,0,0,1,12,7M12,9A3,3,0,1,0,15,12A3,3,0,0,0,12,9Z"},{l:"YouTube",h:"https://www.youtube.com/@kisa4416",p:"M10,15L15.19,12L10,9V15M21.56,7.17C21.69,7.64,21.78,8.27,21.84,9.07C21.91,9.87,21.94,10.56,21.94,11.16L22,12C22,14.19,21.84,15.8,21.56,16.83C21.31,17.73,20.73,18.31,19.83,18.56C19.36,18.69,18.5,18.78,17.18,18.84C15.88,18.91,14.69,18.94,13.59,18.94L12,19C7.81,19,5.2,18.84,4.17,18.56C3.27,18.31,2.69,17.73,2.44,16.83C2.31,16.36,2.22,15.73,2.16,14.93C2.09,14.13,2.06,13.44,2.06,12.84L2,12C2,9.81,2.16,8.2,2.44,7.17C2.69,6.27,3.27,5.69,4.17,5.44C4.64,5.31,5.5,5.22,6.82,5.16C8.12,5.09,9.31,5.06,10.41,5.06L12,5C16.19,5,18.8,5.16,19.83,5.44C20.73,5.69,21.31,6.27,21.56,7.17Z"}].map(({l,h,p})=>(
+        <a key={l} href={h} target="_blank" rel="noopener noreferrer" title={l} style={{width:34,height:34,borderRadius:"50%",border:`1px solid ${C.text}33`,display:"flex",alignItems:"center",justifyContent:"center",transition:"border-color 0.3s",textDecoration:"none"}}
+          onMouseEnter={e=>e.currentTarget.style.borderColor=`${C.gold}88`} onMouseLeave={e=>e.currentTarget.style.borderColor=`${C.text}33`}>
+          <svg width="15" height="15" viewBox="0 0 24 24"><path d={p} fill={C.goldLight}/></svg>
+        </a>
+      ))}
+    </div>
+  </div>);
+}
+ 
+function Biography(){
+  const [lang,setLang]=useState("KR");
+  return(<><SectionTitle title="Biography"/><PhotoBanner {...BANNERS.Biography}/>
+    <div style={{maxWidth:1000,margin:"0 auto",padding:"48px 32px 80px"}}>
+      <div style={{display:"flex",gap:8,marginBottom:40}}>{["KR","EN"].map(l=><button key={l} onClick={()=>setLang(l)} style={{padding:"10px 24px",borderRadius:4,cursor:"pointer",fontSize:11,fontFamily:F.b,fontWeight:600,letterSpacing:1.5,transition:"all 0.3s",background:lang===l?`${C.gold}22`:"transparent",border:`1px solid ${lang===l?C.gold:C.border}`,color:lang===l?C.gold:C.muted}}>{l==="KR"?"KOREAN":"ENGLISH"}</button>)}</div>
+      <div className="bl" style={{display:"flex",gap:56,alignItems:"flex-start"}}>
+        <div style={{flex:1}}>{BIO[lang].split("\n\n").map((p,i)=><p key={`${lang}-${i}`} style={{fontFamily:F.b,fontSize:16,lineHeight:2,color:C.text,margin:"0 0 24px"}}>{p}</p>)}</div>
+        <div className="bp" style={{width:340,minWidth:340,height:460,borderRadius:4,background:`linear-gradient(160deg,hsl(30,15%,22%),hsl(25,12%,16%))`,border:`1px solid ${C.borderLight}`,position:"sticky",top:100,display:"flex",alignItems:"center",justifyContent:"center"}}><span style={{fontFamily:F.b,fontSize:12,color:C.dim,letterSpacing:2}}>PROFILE PHOTO</span></div>
+      </div>
+    </div>
+    <style>{`@media(max-width:768px){.bl{flex-direction:column-reverse!important}.bp{width:100%!important;min-width:0!important;height:320px!important;position:static!important}}`}</style>
+  </>);
+}
+ 
+function SchedulePage(){
+  const yrs=[...new Set(SCHEDULE.map(s=>s.year))].sort((a,b)=>b-a);
+  const [yr,setYr]=useState(yrs[0]);
+  const fl=SCHEDULE.filter(s=>s.year===yr);
+  return(<><SectionTitle title="Schedule"/><PhotoBanner {...BANNERS.Schedule}/>
+    <div style={{maxWidth:1000,margin:"0 auto",padding:"48px 32px 80px"}}>
+      <div style={{display:"flex",justifyContent:"flex-end",marginBottom:32}}>
+        <select value={yr} onChange={e=>setYr(Number(e.target.value))} style={{background:"transparent",border:`1px solid ${C.gold}66`,borderRadius:4,color:C.gold,padding:"10px 20px",fontFamily:F.b,fontSize:13,letterSpacing:1,cursor:"pointer",outline:"none"}}>{yrs.map(y=><option key={y} value={y} style={{background:C.surface}}>{y}</option>)}</select>
+      </div>
+      {fl.map((s,i)=><div key={s.id}>
+        <div className="sr" style={{display:"flex",gap:48,marginBottom:20,alignItems:"flex-start"}}>
+          <div style={{flex:1}}>
+            <p style={{fontFamily:F.b,fontSize:13,color:C.gold,letterSpacing:1.5,margin:"0 0 10px",fontWeight:500}}>{s.date}</p>
+            <h3 style={{fontFamily:F.d,fontSize:28,color:C.text,margin:"0 0 12px",fontWeight:400,fontStyle:"italic"}}>{s.title}</h3>
+            {s.role&&<p style={{fontFamily:F.b,fontSize:14,color:C.goldLight,margin:"0 0 8px"}}>{s.role}</p>}
+            <p style={{fontFamily:F.b,fontSize:14,color:C.muted,margin:"0 0 4px"}}>{s.venue}</p>
+            <p style={{fontFamily:F.b,fontSize:13,color:C.dim,margin:"0 0 16px"}}>{s.conductor}{s.director?` / ${s.director}`:""}</p>
+            <a href={s.link} style={{fontFamily:F.b,fontSize:11,color:C.gold,letterSpacing:2,textDecoration:"none",border:`1px solid ${C.gold}55`,padding:"8px 20px",borderRadius:3,transition:"all 0.3s",display:"inline-block"}} onMouseEnter={e=>{e.currentTarget.style.background=C.gold;e.currentTarget.style.color=C.bg}} onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.color=C.gold}}>MORE INFO</a>
+          </div>
+          <div className="sp" style={{width:220,minWidth:220,height:150,borderRadius:4,background:`linear-gradient(135deg,hsl(${20+i*15},14%,20%),hsl(${25+i*12},10%,14%))`,border:`1px solid ${C.borderLight}`}}/>
+        </div>
+        {i<fl.length-1&&<div style={{height:1,background:C.border,margin:"24px 0 32px",opacity:0.4}}/>}
+      </div>)}
+    </div>
+    <style>{`@media(max-width:768px){.sr{flex-direction:column!important}.sp{width:100%!important;min-width:0!important;height:200px!important}}`}</style>
+  </>);
+}
+ 
+function VideoPage(){
+  const [modal,setModal]=useState(null);
+  return(<><SectionTitle title="Video"/><PhotoBanner {...BANNERS.Video}/>
+    <div style={{maxWidth:1000,margin:"0 auto",padding:"48px 32px 80px"}}>
+      <div className="vg" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:28}}>
+        {VIDEOS.map(v=><div key={v.id} onClick={()=>setModal(v)} style={{cursor:"pointer"}}>
+          <div style={{position:"relative",paddingBottom:"56.25%",borderRadius:4,overflow:"hidden",background:`linear-gradient(135deg,hsl(${200+v.id*8},12%,18%),hsl(${210+v.id*6},10%,12%))`,border:`1px solid ${C.borderLight}`,transition:"border-color 0.3s"}} onMouseEnter={e=>e.currentTarget.style.borderColor=C.gold} onMouseLeave={e=>e.currentTarget.style.borderColor=C.borderLight}>
+            <div style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",width:56,height:56,borderRadius:"50%",background:`${C.gold}33`,display:"flex",alignItems:"center",justifyContent:"center"}}><div style={{width:0,height:0,borderLeft:`16px solid ${C.goldLight}`,borderTop:"10px solid transparent",borderBottom:"10px solid transparent",marginLeft:4}}/></div>
+          </div>
+          <p style={{fontFamily:F.b,fontSize:13,color:C.muted,margin:"12px 0 0",lineHeight:1.4}}>{v.title}</p>
+        </div>)}
+      </div>
+    </div>
+    {modal&&<div onClick={()=>setModal(null)} style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.85)",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",backdropFilter:"blur(8px)"}}>
+      <div onClick={e=>e.stopPropagation()} style={{width:"90%",maxWidth:860,aspectRatio:"16/9",borderRadius:8,overflow:"hidden"}}><iframe width="100%" height="100%" src={`https://www.youtube.com/embed/${modal.ytId}?autoplay=1`} frameBorder="0" allow="autoplay;encrypted-media" allowFullScreen/></div>
+      <button onClick={()=>setModal(null)} style={{position:"absolute",top:28,right:28,background:"none",border:"none",color:C.goldLight,fontSize:30,cursor:"pointer"}}>{"\u2715"}</button>
+    </div>}
+    <style>{`@media(max-width:640px){.vg{grid-template-columns:1fr!important}}`}</style>
+  </>);
+}
+ 
+function GRow({label,items,tall}){
+  const ref=useRef(null);const [dr,setDr]=useState(false);const [sx,setSx]=useState(0);const [sl,setSl]=useState(0);const [lb,setLb]=useState(null);
+  const dn=e=>{setDr(true);setSx(e.pageX||e.touches?.[0]?.pageX);setSl(ref.current.scrollLeft)};
+  const mv=e=>{if(!dr)return;e.preventDefault();ref.current.scrollLeft=sl-((e.pageX||e.touches?.[0]?.pageX)-sx)};
+  const up=()=>setDr(false);
+  return(<div style={{marginBottom:48}}>
+    <div style={{maxWidth:1000,margin:"0 auto",padding:"0 32px"}}><p style={{fontFamily:F.b,fontSize:12,letterSpacing:4,color:C.goldLight,marginBottom:16,fontWeight:500}}>{label}</p></div>
+    <div ref={ref} onMouseDown={dn} onMouseMove={mv} onMouseUp={up} onMouseLeave={up} onTouchStart={dn} onTouchMove={mv} onTouchEnd={up} style={{display:"flex",gap:16,overflowX:"auto",cursor:dr?"grabbing":"grab",scrollbarWidth:"none",userSelect:"none",WebkitUserSelect:"none",paddingLeft:32,paddingRight:32}}>
+      {items.map(it=><div key={it.id} onClick={()=>!dr&&setLb(it)} style={{minWidth:tall?220:280,height:tall?300:200,borderRadius:4,flexShrink:0,transition:"transform 0.3s",background:`linear-gradient(135deg,hsl(${it.hue},${it.sat}%,20%),hsl(${it.hue+10},${it.sat-3}%,14%))`,border:`1px solid ${C.borderLight}`}} onMouseEnter={e=>e.currentTarget.style.transform="scale(1.02)"} onMouseLeave={e=>e.currentTarget.style.transform="scale(1)"}/>)}
+    </div>
+    {lb&&<div onClick={()=>setLb(null)} style={{position:"fixed",inset:0,zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(0,0,0,0.7)",backdropFilter:"blur(14px)",cursor:"pointer"}}><div style={{width:"85%",maxWidth:750,height:"75vh",borderRadius:6,background:`linear-gradient(135deg,hsl(${lb.hue},${lb.sat}%,22%),hsl(${lb.hue},${lb.sat-2}%,16%))`,border:`1px solid ${C.borderLight}`}}/></div>}
+  </div>);
+}
+function GalleryPage(){return(<><SectionTitle title="Gallery"/><PhotoBanner {...BANNERS.Gallery}/><div style={{paddingTop:48,paddingBottom:80}}><GRow label="PORTRAITS" items={GP} tall/><GRow label="PERFORMANCE" items={GS}/></div></>);}
+ 
+function NewsPage(){
+  const [pg,setPg]=useState(1);const pp=5;const tp=Math.ceil(NEWS.length/pp);const it=NEWS.slice((pg-1)*pp,pg*pp);
+  return(<><SectionTitle title="News"/><PhotoBanner {...BANNERS.News}/>
+    <div style={{maxWidth:1000,margin:"0 auto",padding:"48px 32px 80px"}}>
+      {it.map((n,i)=><div key={n.id}>
+        <div className="nr" style={{display:"flex",gap:40,alignItems:"center",flexDirection:i%2===0?"row":"row-reverse"}}>
+          <div className="ni" style={{width:380,minWidth:380,height:220,borderRadius:4,flexShrink:0,background:`linear-gradient(135deg,hsl(${n.hue},14%,20%),hsl(${n.hue+10},10%,14%))`,border:`1px solid ${C.borderLight}`}}/>
+          <div style={{flex:1}}>
+            <p style={{fontFamily:F.b,fontSize:12,color:C.dim,margin:"0 0 8px",letterSpacing:1}}>{n.source} &middot; {new Date(n.date).toLocaleDateString("en-US",{year:"numeric",month:"short",day:"numeric"})}</p>
+            <h3 style={{fontFamily:F.d,fontSize:24,color:C.text,margin:"0 0 14px",fontWeight:400,lineHeight:1.35}}>{n.title}</h3>
+            <p style={{fontFamily:F.b,fontSize:14,color:C.muted,margin:"0 0 20px",lineHeight:1.8}}>{n.summary}</p>
+            <a href={n.link} style={{fontFamily:F.b,fontSize:11,color:C.gold,letterSpacing:2,textDecoration:"none",border:`1px solid ${C.gold}55`,padding:"8px 22px",borderRadius:3,transition:"all 0.3s",display:"inline-block"}} onMouseEnter={e=>{e.currentTarget.style.background=C.gold;e.currentTarget.style.color=C.bg}} onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.color=C.gold}}>READ MORE &rarr;</a>
+          </div>
+        </div>
+        {i<it.length-1&&<div style={{height:1,background:C.border,margin:"36px 0",opacity:0.3}}/>}
+      </div>)}
+      <div style={{display:"flex",justifyContent:"center",gap:8,marginTop:56}}>
+        {Array.from({length:tp},(_,i)=>i+1).map(p=><button key={p} onClick={()=>setPg(p)} style={{width:40,height:40,borderRadius:4,cursor:"pointer",fontSize:14,fontFamily:F.b,fontWeight:500,transition:"all 0.3s",background:pg===p?`${C.gold}22`:"transparent",border:`1px solid ${pg===p?C.gold:C.border}`,color:pg===p?C.gold:C.muted}}>{p}</button>)}
+        {pg<tp&&<button onClick={()=>setPg(pg+1)} style={{width:40,height:40,borderRadius:4,cursor:"pointer",fontSize:14,fontFamily:F.b,background:"transparent",border:`1px solid ${C.border}`,color:C.muted}}>&rarr;</button>}
+      </div>
+    </div>
+    <style>{`@media(max-width:768px){.nr{flex-direction:column!important}.ni{width:100%!important;min-width:0!important;height:220px!important}}`}</style>
+  </>);
+}
+ 
+function ContactPage(){
+  const [sent,setSent]=useState(false);
+  const iS={width:"100%",padding:"14px 18px",background:"transparent",border:`1px solid ${C.border}`,borderRadius:4,color:C.text,fontFamily:F.b,fontSize:15,outline:"none",transition:"border-color 0.3s",boxSizing:"border-box"};
+  return(<><SectionTitle title="Contact"/><PhotoBanner {...BANNERS.Contact}/>
+    <div style={{maxWidth:1000,margin:"0 auto",padding:"48px 32px 80px"}}>
+      <p style={{fontFamily:F.b,fontSize:16,color:C.muted,marginBottom:40,lineHeight:1.8,maxWidth:550}}>For inquiries regarding performances, collaborations, or management, please fill out the form below.</p>
+      {sent?<div style={{textAlign:"center",padding:"80px 0"}}><p style={{fontFamily:F.d,fontSize:32,color:C.gold,marginBottom:14}}>Thank you</p><p style={{fontFamily:F.b,fontSize:15,color:C.muted}}>Your message has been sent successfully.</p></div>:
+      <div style={{maxWidth:640}}>
+        <div className="cr" style={{display:"flex",gap:20,marginBottom:24}}>
+          <div style={{flex:1}}><label style={{fontFamily:F.b,fontSize:10,color:C.goldLight,letterSpacing:2.5,display:"block",marginBottom:10}}>FIRST NAME</label><input style={iS} onFocus={e=>e.target.style.borderColor=C.gold} onBlur={e=>e.target.style.borderColor=C.border}/></div>
+          <div style={{flex:1}}><label style={{fontFamily:F.b,fontSize:10,color:C.goldLight,letterSpacing:2.5,display:"block",marginBottom:10}}>LAST NAME</label><input style={iS} onFocus={e=>e.target.style.borderColor=C.gold} onBlur={e=>e.target.style.borderColor=C.border}/></div>
+        </div>
+        <div style={{marginBottom:24}}><label style={{fontFamily:F.b,fontSize:10,color:C.goldLight,letterSpacing:2.5,display:"block",marginBottom:10}}>E-MAIL</label><input type="email" style={iS} onFocus={e=>e.target.style.borderColor=C.gold} onBlur={e=>e.target.style.borderColor=C.border}/></div>
+        <div style={{marginBottom:32}}><label style={{fontFamily:F.b,fontSize:10,color:C.goldLight,letterSpacing:2.5,display:"block",marginBottom:10}}>MESSAGE</label><textarea rows={6} style={{...iS,resize:"vertical"}} onFocus={e=>e.target.style.borderColor=C.gold} onBlur={e=>e.target.style.borderColor=C.border}/></div>
+        <button onClick={()=>setSent(true)} style={{padding:"16px 44px",background:C.gold,border:"none",borderRadius:4,color:C.bg,fontFamily:F.b,fontSize:12,fontWeight:600,letterSpacing:2.5,cursor:"pointer",transition:"opacity 0.3s"}} onMouseEnter={e=>e.currentTarget.style.opacity="0.85"} onMouseLeave={e=>e.currentTarget.style.opacity="1"}>SEND MESSAGE</button>
+      </div>}
+    </div>
+    <style>{`@media(max-width:640px){.cr{flex-direction:column!important}}`}</style>
+  </>);
+}
+ 
+function Footer(){return(<footer style={{background:C.bg,borderTop:`1px solid ${C.border}`,padding:"40px 32px",textAlign:"center"}}><span style={{fontFamily:F.d,fontSize:16,color:C.gold,letterSpacing:3}}>JIN</span><p style={{fontFamily:F.b,fontSize:11,color:C.dim,marginTop:14,letterSpacing:1}}>Copyright &copy; Sangjin Kim. All rights reserved.</p></footer>);}
+ 
+export default function App(){
+  const [page,setPage]=useState("Home");
+  const [scrolled,setScrolled]=useState(false);
+  useEffect(()=>{const h=()=>setScrolled(window.scrollY>40);window.addEventListener("scroll",h);return()=>window.removeEventListener("scroll",h)},[]);
+  const go=useCallback(p=>{setPage(p);window.scrollTo(0,0)},[]);
+  return(<div style={{background:C.bg,minHeight:"100vh"}}>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+    <Nav current={page} go={go} scrolled={page!=="Home"||scrolled}/>
+    {page==="Home"&&<Home/>}
+    {page==="Biography"&&<Biography/>}
+    {page==="Schedule"&&<SchedulePage/>}
+    {page==="Video"&&<VideoPage/>}
+    {page==="Gallery"&&<GalleryPage/>}
+    {page==="News"&&<NewsPage/>}
+    {page==="Contact"&&<ContactPage/>}
+    {page!=="Home"&&<Footer/>}
+  </div>);
+}
+ 
