@@ -168,24 +168,29 @@ function ArrowBtn({direction,onClick}){
 }
  
 function GRow({label,items,tall}){
-  const ref=useRef(null);
-  const [dr,setDr]=useState(false);const [sx,setSx]=useState(0);const [sl,setSl]=useState(0);const [lb,setLb]=useState(null);
+  const ref=useRef(null);const [dr,setDr]=useState(false);const [sx,setSx]=useState(0);const [sl,setSl]=useState(0);const [lbIdx,setLbIdx]=useState(null);
   const dn=e=>{setDr(true);setSx(e.pageX||e.touches?.[0]?.pageX);setSl(ref.current.scrollLeft)};
   const mv=e=>{if(!dr)return;e.preventDefault();ref.current.scrollLeft=sl-((e.pageX||e.touches?.[0]?.pageX)-sx)};
   const up=()=>setDr(false);
   const scrollBy=(dir)=>{if(ref.current)ref.current.scrollBy({left:dir*300,behavior:"smooth"})};
+  useEffect(()=>{if(lbIdx===null)return;const handler=(e)=>{if(e.key==="ArrowRight")setLbIdx(prev=>prev<items.length-1?prev+1:0);else if(e.key==="ArrowLeft")setLbIdx(prev=>prev>0?prev-1:items.length-1);else if(e.key==="Escape")setLbIdx(null)};window.addEventListener("keydown",handler);return()=>window.removeEventListener("keydown",handler)},[lbIdx,items.length]);
   if(items.length===0) return null;
   return(<div style={{marginBottom:64}}>
     <p style={{fontFamily:F.b,fontSize:15,letterSpacing:6,color:C.goldLight,marginBottom:24,fontWeight:500,textAlign:"center"}}>{label}</p>
-    <div style={{position:"relative",maxWidth:1500,margin:"0 auto",padding:"0 52px"}}>
+    <div style={{position:"relative",maxWidth:1200,margin:"0 auto",padding:"0 52px"}}>
       <ArrowBtn direction="left" onClick={()=>scrollBy(-1)}/>
       <div ref={ref} onMouseDown={dn} onMouseMove={mv} onMouseUp={up} onMouseLeave={up} onTouchStart={dn} onTouchMove={mv} onTouchEnd={up}
         style={{display:"flex",gap:14,overflowX:"auto",cursor:dr?"grabbing":"grab",scrollbarWidth:"none",userSelect:"none",WebkitUserSelect:"none",scrollBehavior:"smooth"}}>
-        {items.map(it=><div key={it.id} onClick={()=>!dr&&setLb(it)} style={{minWidth:tall?180:240,height:tall?250:170,borderRadius:4,flexShrink:0,transition:"transform 0.3s",background:it.imageUrl?`url(${it.imageUrl}) center/cover`:`linear-gradient(135deg,hsl(${it.hue||25},${it.sat||15}%,20%),hsl(${(it.hue||25)+10},${(it.sat||15)-3}%,14%))`,border:`1px solid ${C.borderLight}`}} onMouseEnter={e=>e.currentTarget.style.transform="scale(1.02)"} onMouseLeave={e=>e.currentTarget.style.transform="scale(1)"}/>)}
+        {items.map((it,idx)=><div key={it.id} onClick={()=>!dr&&setLbIdx(idx)} style={{minWidth:tall?180:240,height:tall?250:170,borderRadius:4,flexShrink:0,transition:"transform 0.3s",background:it.imageUrl?`url(${it.imageUrl}) center/cover`:`linear-gradient(135deg,hsl(${it.hue||25},${it.sat||15}%,20%),hsl(${(it.hue||25)+10},${(it.sat||15)-3}%,14%))`,border:`1px solid ${C.borderLight}`}} onMouseEnter={e=>e.currentTarget.style.transform="scale(1.02)"} onMouseLeave={e=>e.currentTarget.style.transform="scale(1)"}/>)}
       </div>
       <ArrowBtn direction="right" onClick={()=>scrollBy(1)}/>
     </div>
-    {lb&&<div onClick={()=>setLb(null)} style={{position:"fixed",inset:0,zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(0,0,0,0.7)",backdropFilter:"blur(14px)",cursor:"pointer"}}><div style={{width:"85%",maxWidth:750,height:"75vh",borderRadius:6,background:lb.imageUrl?`url(${lb.imageUrl}) center/cover`:`#1E1E1E`,border:`1px solid ${C.borderLight}`}}/></div>}
+    {lbIdx!==null&&<div onClick={()=>setLbIdx(null)} style={{position:"fixed",inset:0,zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(0,0,0,0.85)",backdropFilter:"blur(14px)",cursor:"pointer"}}>
+      <button onClick={e=>{e.stopPropagation();setLbIdx(lbIdx>0?lbIdx-1:items.length-1)}} style={{position:"absolute",left:20,top:"50%",transform:"translateY(-50%)",width:44,height:44,borderRadius:"50%",border:`1px solid ${C.gold}44`,background:"rgba(30,30,30,0.6)",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",zIndex:3,padding:0}} onMouseEnter={e=>e.currentTarget.style.borderColor=`${C.gold}aa`} onMouseLeave={e=>e.currentTarget.style.borderColor=`${C.gold}44`}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={C.gold} strokeWidth="1.5" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <img onClick={e=>e.stopPropagation()} src={items[lbIdx].imageUrl||""} alt="" style={{maxWidth:"90vw",maxHeight:"90vh",objectFit:"contain",borderRadius:6,border:`1px solid ${C.borderLight}`}}/>
+      <button onClick={e=>{e.stopPropagation();setLbIdx(lbIdx<items.length-1?lbIdx+1:0)}} style={{position:"absolute",right:20,top:"50%",transform:"translateY(-50%)",width:44,height:44,borderRadius:"50%",border:`1px solid ${C.gold}44`,background:"rgba(30,30,30,0.6)",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",zIndex:3,padding:0}} onMouseEnter={e=>e.currentTarget.style.borderColor=`${C.gold}aa`} onMouseLeave={e=>e.currentTarget.style.borderColor=`${C.gold}44`}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={C.gold} strokeWidth="1.5" strokeLinecap="round"><path d="M9 18l6-6-6-6"/></svg></button>
+      <button onClick={()=>setLbIdx(null)} style={{position:"absolute",top:20,right:20,background:"none",border:"none",color:C.goldLight,fontSize:28,cursor:"pointer",zIndex:3}}>{"\u2715"}</button>
+    </div>}
   </div>);
 }
  
