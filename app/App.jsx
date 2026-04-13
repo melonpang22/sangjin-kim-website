@@ -8,36 +8,7 @@ const C = {
   text: "#E8E3D8", muted: "#9A9590", dim: "#6A6560",
 };
 const F = { d: "'Cormorant Garamond',Georgia,serif", b: "'Montserrat','Helvetica Neue',sans-serif" };
- 
 const PAGES = ["Home","Biography","Schedule","Video","Gallery","News","Contact"];
- 
-/* ═══ FALLBACK DATA (used when Sanity has no content yet) ═══ */
-const FB_SCHEDULE = [
-  { id:"1", year:2026, date:"7, 13, 22 September 2026", title:"Il Barbiere di Siviglia", role:"Don Basilio", venue:"Berlin Staatsoper", conductor:"Leonardo Sini", director:"Ruth Berghaus", link:"#" },
-  { id:"2", year:2026, date:"28, 31 October / 3, 5 November 2026", title:"Das Rheingold", role:"Fasolt", venue:"Teatro alla Scala", conductor:"Christian Thielemann", director:"David McVicar", link:"#" },
-  { id:"3", year:2026, date:"19, 20, 21 December 2026", title:"Beethoven: Symphony No.9", role:"Bass Soloist", venue:"Seoul Lotte Concert Hall", conductor:"Jaap van Zweden", link:"#" },
-];
-const FB_VIDEOS = [
-  { id:"1", title:"Verdi: Aida — Ramfis", youtubeId:"mGVTh9cno_U" },
-  { id:"2", title:"Donizetti: Lucia di Lammermoor", youtubeId:"r2_oJTnVbG0" },
-  { id:"3", title:"Bellini: I Puritani", youtubeId:"R_xo8cena2o" },
-  { id:"4", title:"Verdi: Rigoletto — Sparafucile", youtubeId:"VFpPfub57B4" },
-  { id:"5", title:"Wagner: Die Walkure — Hunding", youtubeId:"q4Pn55qa1e8" },
-  { id:"6", title:"Beethoven: Symphony No.9", youtubeId:"gb2pqPhMKxA" },
-];
-const FB_NEWS = [
-  { id:"1", title:"A commanding Fasolt at Teatro alla Scala", source:"The Guardian", date:"2026-01-20", summary:"Kim's rich, cavernous bass filled the auditorium with warmth and authority.", link:"#" },
-  { id:"2", title:"Ein Pogner von seltener Klasse", source:"Opernwelt", date:"2025-12-05", summary:"Sein Bass durchdringt muhelos den Raum und verleiht der Figur tiefgrundige Wurde.", link:"#" },
-  { id:"3", title:"Colline d'une noblesse rare", source:"Le Monde", date:"2025-10-15", summary:"Une incarnation magistrale du philosophe, portee par un timbre somptueux.", link:"#" },
-  { id:"4", title:"Vodnik mit gottlicher Resonanz", source:"Suddeutsche Zeitung", date:"2025-06-22", summary:"Kim bringt eine Warme und Erhabenheit in die Rolle des Wassermanns.", link:"#" },
-  { id:"5", title:"A Basilio full of charm", source:"Financial Times", date:"2025-03-10", summary:"Kim brought irresistible comic timing alongside his magnificent bass.", link:"#" },
-  { id:"6", title:"Un Requiem di rara potenza", source:"Corriere della Sera", date:"2024-11-28", summary:"La voce di Kim e un fenomeno naturale: profonda e infinitamente espressiva.", link:"#" },
-];
-const FB_BIO = {
-  korean: "바리톤 김상진은 깊고 풍부한 음색과 설득력 있는 무대 연기로 세계 주요 오페라 하우스에서 활발히 활동하고 있습니다.\n\n서울대학교와 베를린 한스 아이슬러 음대를 졸업한 후, 빈 국립오페라, 바이에른 국립오페라, 로열 오페라 하우스, 테아트로 알라 스칼라, 파리 국립오페라, 잘츠부르크 페스티벌 등 세계 정상급 무대에서 주역으로 활동해왔습니다.\n\n모차르트의 사라스트로와 피가로, 베르디의 필리포 2세와 피에스코, 바그너의 구르네만츠와 마르케 왕 등 폭넓은 레퍼토리를 소화하며, 베르디 레퀴엠, 베토벤 교향곡 9번 등 콘서트 무대에서도 깊은 인상을 남기고 있습니다.",
-  english: "Acclaimed as one of the most compelling baritones of his generation, Sangjin Kim has captivated audiences at the world's leading opera houses with his rich, resonant voice and commanding stage presence.\n\nA graduate of Seoul National University and the Hochschule fur Musik Hanns Eisler Berlin, he has performed principal roles at the Wiener Staatsoper, Bayerische Staatsoper, Royal Opera House, Teatro alla Scala, and the Salzburg Festival.\n\nHis repertoire spans from Mozart's Sarastro to Verdi's Filippo II, Wagner's Gurnemanz and King Marke. He is equally celebrated on the concert platform with Verdi's Requiem and Beethoven's Ninth Symphony.",
-};
- 
 const BANNERS = {
   Biography:{hue:220,quote:"The stage is not merely a place to sing, but a world to inhabit."},
   Schedule:{hue:35,quote:"Every note carries a lifetime of emotion."},
@@ -47,19 +18,16 @@ const BANNERS = {
   Contact:{hue:25,quote:"I look forward to hearing from you."},
 };
  
-/* ═══ SANITY DATA HOOK ═══ */
 function useSanity(query, fallback) {
   const [data, setData] = useState(null);
   useEffect(() => {
     client.fetch(query).then(result => {
-      if (result && result.length > 0) setData(result);
-      else if (result && !Array.isArray(result) && Object.keys(result).length > 0) setData(result);
+      if (result && ((Array.isArray(result) && result.length > 0) || (!Array.isArray(result) && Object.keys(result).length > 0))) setData(result);
     }).catch(() => {});
   }, [query]);
   return data || fallback;
 }
  
-/* ═══ NAV ═══ */
 function Nav({current,go,scrolled}){
   const [open,setOpen]=useState(false);
   return(
@@ -89,19 +57,30 @@ function SectionTitle({title}){
   </div>);
 }
  
-/* ═══ HOME ═══ */
+function EmptyState({message}){
+  return(<div style={{textAlign:"center",padding:"60px 0"}}><p style={{fontFamily:F.b,fontSize:14,color:C.dim}}>{message}</p></div>);
+}
+ 
+/* ═══ HOME (Sanity slides) ═══ */
 function Home(){
   const [idx,setIdx]=useState(0);
-  const sl=[{bg:`linear-gradient(135deg,hsl(25,18%,18%),hsl(30,15%,12%))`},{bg:`linear-gradient(135deg,hsl(220,15%,16%),hsl(210,12%,10%))`},{bg:`linear-gradient(135deg,hsl(35,20%,17%),hsl(28,16%,11%))`}];
-  useEffect(()=>{const t=setInterval(()=>setIdx(i=>(i+1)%sl.length),5000);return()=>clearInterval(t)},[]);
+  const slides = useSanity(`*[_type=="homeSlide"]|order(order asc){"imageUrl":image.asset->url}`, []);
+  const fallbackBgs = [
+    `linear-gradient(135deg,hsl(25,18%,18%),hsl(30,15%,12%))`,
+    `linear-gradient(135deg,hsl(220,15%,16%),hsl(210,12%,10%))`,
+    `linear-gradient(135deg,hsl(35,20%,17%),hsl(28,16%,11%))`,
+  ];
+  const bgList = slides.length > 0 ? slides : fallbackBgs.map(bg=>({bg}));
+  useEffect(()=>{if(bgList.length>1){const t=setInterval(()=>setIdx(i=>(i+1)%bgList.length),5000);return()=>clearInterval(t)}},[bgList.length]);
+ 
   return(<div style={{position:"relative",width:"100%",height:"100vh",overflow:"hidden"}}>
-    {sl.map((s,i)=><div key={i} style={{position:"absolute",inset:0,background:s.bg,opacity:idx===i?1:0,transition:"opacity 1.8s ease"}}/>)}
+    {bgList.map((s,i)=><div key={i} style={{position:"absolute",inset:0,background:s.imageUrl?`url(${s.imageUrl}) center/cover`:s.bg,opacity:idx===i?1:0,transition:"opacity 1.8s ease"}}/>)}
     <div style={{position:"absolute",inset:0,background:"rgba(30,30,30,0.42)"}}/>
     <div style={{position:"relative",zIndex:2,height:"100%",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",textAlign:"center",padding:"0 24px"}}>
       <div style={{fontSize:14,fontFamily:F.b,letterSpacing:7,color:C.gold,opacity:0.85,marginBottom:18,fontWeight:500}}>BARITONE</div>
       <h1 style={{fontFamily:F.d,fontSize:"clamp(40px,9vw,72px)",fontWeight:300,color:C.text,margin:0,letterSpacing:4,lineHeight:1.15}}>Sangjin Kim</h1>
       <div style={{width:56,height:1,background:C.gold,opacity:0.4,margin:"28px 0"}}/>
-      <div style={{display:"flex",gap:8,marginTop:8}}>{sl.map((_,i)=><button key={i} onClick={()=>setIdx(i)} style={{width:idx===i?22:6,height:6,borderRadius:3,border:"none",cursor:"pointer",background:idx===i?`${C.gold}99`:`${C.text}33`,transition:"all 0.4s",padding:0}}/>)}</div>
+      {bgList.length>1&&<div style={{display:"flex",gap:8,marginTop:8}}>{bgList.map((_,i)=><button key={i} onClick={()=>setIdx(i)} style={{width:idx===i?22:6,height:6,borderRadius:3,border:"none",cursor:"pointer",background:idx===i?`${C.gold}99`:`${C.text}33`,transition:"all 0.4s",padding:0}}/>)}</div>}
     </div>
     <div style={{position:"absolute",bottom:36,left:0,right:0,zIndex:3,display:"flex",justifyContent:"center",gap:18}}>
       {[{l:"Instagram",h:"https://www.instagram.com/jin_kisa/",p:"M7.8,2H16.2C19.4,2,22,4.6,22,7.8V16.2A5.8,5.8,0,0,1,16.2,22H7.8C4.6,22,2,19.4,2,16.2V7.8A5.8,5.8,0,0,1,7.8,2M7.6,4A3.6,3.6,0,0,0,4,7.6V16.4A3.6,3.6,0,0,0,7.6,20H16.4A3.6,3.6,0,0,0,20,16.4V7.6A3.6,3.6,0,0,0,16.4,4H7.6M17.25,5.5A1.25,1.25,0,1,1,16,6.75A1.25,1.25,0,0,1,17.25,5.5M12,7A5,5,0,1,1,7,12A5,5,0,0,1,12,7M12,9A3,3,0,1,0,15,12A3,3,0,0,0,12,9Z"},{l:"YouTube",h:"https://www.youtube.com/@kisa4416",p:"M10,15L15.19,12L10,9V15M21.56,7.17C21.69,7.64,21.78,8.27,21.84,9.07C21.91,9.87,21.94,10.56,21.94,11.16L22,12C22,14.19,21.84,15.8,21.56,16.83C21.31,17.73,20.73,18.31,19.83,18.56C19.36,18.69,18.5,18.78,17.18,18.84C15.88,18.91,14.69,18.94,13.59,18.94L12,19C7.81,19,5.2,18.84,4.17,18.56C3.27,18.31,2.69,17.73,2.44,16.83C2.31,16.36,2.22,15.73,2.16,14.93C2.09,14.13,2.06,13.44,2.06,12.84L2,12C2,9.81,2.16,8.2,2.44,7.17C2.69,6.27,3.27,5.69,4.17,5.44C4.64,5.31,5.5,5.22,6.82,5.16C8.12,5.09,9.31,5.06,10.41,5.06L12,5C16.19,5,18.8,5.16,19.83,5.44C20.73,5.69,21.31,6.27,21.56,7.17Z"}].map(({l,h,p})=>(
@@ -114,37 +93,36 @@ function Home(){
   </div>);
 }
  
-/* ═══ BIOGRAPHY (Sanity connected) ═══ */
+/* ═══ BIOGRAPHY (Sanity only) ═══ */
 function Biography(){
   const [lang,setLang]=useState("KR");
-  const bio = useSanity(`*[_type=="biography"][0]{korean,english}`, FB_BIO);
-  const text = lang === "KR" ? (bio.korean || FB_BIO.korean) : (bio.english || FB_BIO.english);
+  const bio = useSanity(`*[_type=="biography"][0]{korean,english,"photoUrl":profilePhoto.asset->url}`, null);
+  const text = bio ? (lang === "KR" ? bio.korean : bio.english) : null;
   return(<><SectionTitle title="Biography"/><PhotoBanner {...BANNERS.Biography}/>
     <div style={{maxWidth:1000,margin:"0 auto",padding:"48px 32px 80px"}}>
       <div style={{display:"flex",gap:8,marginBottom:40}}>{["KR","EN"].map(l=><button key={l} onClick={()=>setLang(l)} style={{padding:"10px 24px",borderRadius:4,cursor:"pointer",fontSize:11,fontFamily:F.b,fontWeight:600,letterSpacing:1.5,transition:"all 0.3s",background:lang===l?`${C.gold}22`:"transparent",border:`1px solid ${lang===l?C.gold:C.border}`,color:lang===l?C.gold:C.muted}}>{l==="KR"?"KOREAN":"ENGLISH"}</button>)}</div>
-      <div className="bl" style={{display:"flex",gap:56,alignItems:"flex-start"}}>
+      {text?<div className="bl" style={{display:"flex",gap:56,alignItems:"flex-start"}}>
         <div style={{flex:1}}>{text.split("\n\n").map((p,i)=><p key={`${lang}-${i}`} style={{fontFamily:F.b,fontSize:16,lineHeight:2,color:C.text,margin:"0 0 24px"}}>{p}</p>)}</div>
-        <div className="bp" style={{width:340,minWidth:340,height:460,borderRadius:4,background:`linear-gradient(160deg,hsl(30,15%,22%),hsl(25,12%,16%))`,border:`1px solid ${C.borderLight}`,position:"sticky",top:100,display:"flex",alignItems:"center",justifyContent:"center"}}><span style={{fontFamily:F.b,fontSize:12,color:C.dim,letterSpacing:2}}>PROFILE PHOTO</span></div>
-      </div>
+        <div className="bp" style={{width:340,minWidth:340,height:460,borderRadius:4,background:bio.photoUrl?`url(${bio.photoUrl}) center/cover`:`linear-gradient(160deg,hsl(30,15%,22%),hsl(25,12%,16%))`,border:`1px solid ${C.borderLight}`,position:"sticky",top:100,display:"flex",alignItems:"center",justifyContent:"center"}}>{!bio.photoUrl&&<span style={{fontFamily:F.b,fontSize:12,color:C.dim,letterSpacing:2}}>PROFILE PHOTO</span>}</div>
+      </div>:<EmptyState message="Add biography content in Sanity Studio"/>}
     </div>
     <style>{`@media(max-width:768px){.bl{flex-direction:column-reverse!important}.bp{width:100%!important;min-width:0!important;height:320px!important;position:static!important}}`}</style>
   </>);
 }
  
-/* ═══ SCHEDULE (Sanity connected) ═══ */
+/* ═══ SCHEDULE (Sanity only) ═══ */
 function SchedulePage(){
-  const raw = useSanity(`*[_type=="schedule"]|order(year desc, date desc){_id,year,date,title,role,venue,conductor,director,link}`, FB_SCHEDULE);
-  const schedule = raw.map(s=>({...s,id:s._id||s.id}));
-  const yrs=[...new Set(schedule.map(s=>s.year))].sort((a,b)=>b-a);
+  const raw = useSanity(`*[_type=="schedule"]|order(year desc, date desc){"id":_id,year,date,title,role,venue,conductor,director,link,"photoUrl":photo.asset->url}`, []);
+  const yrs=[...new Set(raw.map(s=>s.year))].sort((a,b)=>b-a);
   const [yr,setYr]=useState(null);
   useEffect(()=>{if(yrs.length>0&&yr===null)setYr(yrs[0])},[yrs,yr]);
-  const fl=schedule.filter(s=>s.year===(yr||yrs[0]));
+  const fl=raw.filter(s=>s.year===(yr||yrs[0]));
   return(<><SectionTitle title="Schedule"/><PhotoBanner {...BANNERS.Schedule}/>
     <div style={{maxWidth:1000,margin:"0 auto",padding:"48px 32px 80px"}}>
-      <div style={{display:"flex",justifyContent:"flex-end",marginBottom:32}}>
+      {yrs.length>0&&<div style={{display:"flex",justifyContent:"flex-end",marginBottom:32}}>
         <select value={yr||""} onChange={e=>setYr(Number(e.target.value))} style={{background:"transparent",border:`1px solid ${C.gold}66`,borderRadius:4,color:C.gold,padding:"10px 20px",fontFamily:F.b,fontSize:13,letterSpacing:1,cursor:"pointer",outline:"none"}}>{yrs.map(y=><option key={y} value={y} style={{background:C.surface}}>{y}</option>)}</select>
-      </div>
-      {fl.map((s,i)=><div key={s.id}>
+      </div>}
+      {fl.length>0?fl.map((s,i)=><div key={s.id}>
         <div className="sr" style={{display:"flex",gap:48,marginBottom:20,alignItems:"flex-start"}}>
           <div style={{flex:1}}>
             <p style={{fontFamily:F.b,fontSize:13,color:C.gold,letterSpacing:1.5,margin:"0 0 10px",fontWeight:500}}>{s.date}</p>
@@ -154,31 +132,30 @@ function SchedulePage(){
             <p style={{fontFamily:F.b,fontSize:13,color:C.dim,margin:"0 0 16px"}}>{s.conductor}{s.director?` / ${s.director}`:""}</p>
             {s.link&&<a href={s.link} target="_blank" rel="noopener noreferrer" style={{fontFamily:F.b,fontSize:11,color:C.gold,letterSpacing:2,textDecoration:"none",border:`1px solid ${C.gold}55`,padding:"8px 20px",borderRadius:3,transition:"all 0.3s",display:"inline-block"}} onMouseEnter={e=>{e.currentTarget.style.background=C.gold;e.currentTarget.style.color=C.bg}} onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.color=C.gold}}>MORE INFO</a>}
           </div>
-          <div className="sp" style={{width:220,minWidth:220,height:150,borderRadius:4,background:`linear-gradient(135deg,hsl(${20+i*15},14%,20%),hsl(${25+i*12},10%,14%))`,border:`1px solid ${C.borderLight}`}}/>
+          {s.photoUrl&&<div className="sp" style={{width:220,minWidth:220,height:150,borderRadius:4,background:`url(${s.photoUrl}) center/cover`,border:`1px solid ${C.borderLight}`}}/>}
         </div>
         {i<fl.length-1&&<div style={{height:1,background:C.border,margin:"24px 0 32px",opacity:0.4}}/>}
-      </div>)}
+      </div>):<EmptyState message="Add schedule in Sanity Studio"/>}
     </div>
     <style>{`@media(max-width:768px){.sr{flex-direction:column!important}.sp{width:100%!important;min-width:0!important;height:200px!important}}`}</style>
   </>);
 }
  
-/* ═══ VIDEO (Sanity connected) ═══ */
+/* ═══ VIDEO (Sanity only) ═══ */
 function VideoPage(){
-  const raw = useSanity(`*[_type=="video"]{_id,title,youtubeId}`, FB_VIDEOS);
-  const videos = raw.map(v=>({...v,id:v._id||v.id}));
+  const raw = useSanity(`*[_type=="video"]{"id":_id,title,youtubeId}`, []);
   const [modal,setModal]=useState(null);
   return(<><SectionTitle title="Video"/><PhotoBanner {...BANNERS.Video}/>
     <div style={{maxWidth:1000,margin:"0 auto",padding:"48px 32px 80px"}}>
-      <div className="vg" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:28}}>
-        {videos.map(v=><div key={v.id} onClick={()=>setModal(v)} style={{cursor:"pointer"}}>
+      {raw.length>0?<div className="vg" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:28}}>
+        {raw.map(v=><div key={v.id} onClick={()=>setModal(v)} style={{cursor:"pointer"}}>
           <div style={{position:"relative",paddingBottom:"56.25%",borderRadius:4,overflow:"hidden",background:`url(https://img.youtube.com/vi/${v.youtubeId}/hqdefault.jpg) center/cover`,border:`1px solid ${C.borderLight}`,transition:"border-color 0.3s"}} onMouseEnter={e=>e.currentTarget.style.borderColor=C.gold} onMouseLeave={e=>e.currentTarget.style.borderColor=C.borderLight}>
             <div style={{position:"absolute",inset:0,background:"rgba(0,0,0,0.3)"}}/>
             <div style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",width:56,height:56,borderRadius:"50%",background:`${C.gold}55`,display:"flex",alignItems:"center",justifyContent:"center"}}><div style={{width:0,height:0,borderLeft:`16px solid ${C.goldLight}`,borderTop:"10px solid transparent",borderBottom:"10px solid transparent",marginLeft:4}}/></div>
           </div>
           <p style={{fontFamily:F.b,fontSize:13,color:C.muted,margin:"12px 0 0",lineHeight:1.4}}>{v.title}</p>
         </div>)}
-      </div>
+      </div>:<EmptyState message="Add videos in Sanity Studio"/>}
     </div>
     {modal&&<div onClick={()=>setModal(null)} style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.85)",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",backdropFilter:"blur(8px)"}}>
       <div onClick={e=>e.stopPropagation()} style={{width:"90%",maxWidth:860,aspectRatio:"16/9",borderRadius:8,overflow:"hidden"}}><iframe width="100%" height="100%" src={`https://www.youtube.com/embed/${modal.youtubeId}?autoplay=1`} frameBorder="0" allow="autoplay;encrypted-media" allowFullScreen/></div>
@@ -188,40 +165,42 @@ function VideoPage(){
   </>);
 }
  
-/* ═══ GALLERY (Sanity connected) ═══ */
-const FB_GP = Array.from({length:8},(_,i)=>({id:`p${i}`,category:"Portraits",hue:[25,35,30,20,40,28,33,22][i],sat:[15,12,18,14,10,16,13,17][i]}));
-const FB_GS = Array.from({length:8},(_,i)=>({id:`s${i}`,category:"Performance",hue:[210,220,200,240,215,230,205,225][i],sat:[18,15,20,12,16,14,19,13][i]}));
- 
+/* ═══ GALLERY (Sanity only) ═══ */
 function GRow({label,items,tall}){
   const ref=useRef(null);const [dr,setDr]=useState(false);const [sx,setSx]=useState(0);const [sl,setSl]=useState(0);const [lb,setLb]=useState(null);
   const dn=e=>{setDr(true);setSx(e.pageX||e.touches?.[0]?.pageX);setSl(ref.current.scrollLeft)};
   const mv=e=>{if(!dr)return;e.preventDefault();ref.current.scrollLeft=sl-((e.pageX||e.touches?.[0]?.pageX)-sx)};
   const up=()=>setDr(false);
+  if(items.length===0) return null;
   return(<div style={{marginBottom:48}}>
     <div style={{maxWidth:1000,margin:"0 auto",padding:"0 32px"}}><p style={{fontFamily:F.b,fontSize:12,letterSpacing:4,color:C.goldLight,marginBottom:16,fontWeight:500}}>{label}</p></div>
     <div ref={ref} onMouseDown={dn} onMouseMove={mv} onMouseUp={up} onMouseLeave={up} onTouchStart={dn} onTouchMove={mv} onTouchEnd={up} style={{display:"flex",gap:16,overflowX:"auto",cursor:dr?"grabbing":"grab",scrollbarWidth:"none",userSelect:"none",WebkitUserSelect:"none",paddingLeft:32,paddingRight:32}}>
-      {items.map(it=><div key={it.id||it._id} onClick={()=>!dr&&setLb(it)} style={{minWidth:tall?220:280,height:tall?300:200,borderRadius:4,flexShrink:0,transition:"transform 0.3s",background:it.imageUrl?`url(${it.imageUrl}) center/cover`:`linear-gradient(135deg,hsl(${it.hue||25},${it.sat||15}%,20%),hsl(${(it.hue||25)+10},${(it.sat||15)-3}%,14%))`,border:`1px solid ${C.borderLight}`}} onMouseEnter={e=>e.currentTarget.style.transform="scale(1.02)"} onMouseLeave={e=>e.currentTarget.style.transform="scale(1)"}/>)}
+      {items.map(it=><div key={it.id} onClick={()=>!dr&&setLb(it)} style={{minWidth:tall?220:280,height:tall?300:200,borderRadius:4,flexShrink:0,transition:"transform 0.3s",background:it.imageUrl?`url(${it.imageUrl}) center/cover`:`linear-gradient(135deg,hsl(25,15%,20%),hsl(30,12%,14%))`,border:`1px solid ${C.borderLight}`}} onMouseEnter={e=>e.currentTarget.style.transform="scale(1.02)"} onMouseLeave={e=>e.currentTarget.style.transform="scale(1)"}/>)}
     </div>
-    {lb&&<div onClick={()=>setLb(null)} style={{position:"fixed",inset:0,zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(0,0,0,0.7)",backdropFilter:"blur(14px)",cursor:"pointer"}}><div style={{width:"85%",maxWidth:750,height:"75vh",borderRadius:6,background:lb.imageUrl?`url(${lb.imageUrl}) center/cover`:`linear-gradient(135deg,hsl(${lb.hue||25},${lb.sat||15}%,22%),hsl(${lb.hue||25},${(lb.sat||15)-2}%,16%))`,border:`1px solid ${C.borderLight}`}}/></div>}
+    {lb&&<div onClick={()=>setLb(null)} style={{position:"fixed",inset:0,zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(0,0,0,0.7)",backdropFilter:"blur(14px)",cursor:"pointer"}}><div style={{width:"85%",maxWidth:750,height:"75vh",borderRadius:6,background:lb.imageUrl?`url(${lb.imageUrl}) center/cover`:`#1E1E1E`,border:`1px solid ${C.borderLight}`}}/></div>}
   </div>);
 }
  
 function GalleryPage(){
-  const raw = useSanity(`*[_type=="gallery"]{"id":_id,category,"imageUrl":image.asset->url}`, [...FB_GP,...FB_GS]);
-  const portraits = raw.filter(g=>g.category==="Portraits").length>0 ? raw.filter(g=>g.category==="Portraits") : FB_GP;
-  const performance = raw.filter(g=>g.category==="Performance").length>0 ? raw.filter(g=>g.category==="Performance") : FB_GS;
-  return(<><SectionTitle title="Gallery"/><PhotoBanner {...BANNERS.Gallery}/><div style={{paddingTop:48,paddingBottom:80}}><GRow label="PORTRAITS" items={portraits} tall/><GRow label="PERFORMANCE" items={performance}/></div></>);
+  const raw = useSanity(`*[_type=="gallery"]{"id":_id,category,"imageUrl":image.asset->url}`, []);
+  const portraits = raw.filter(g=>g.category==="Portraits");
+  const performance = raw.filter(g=>g.category==="Performance");
+  return(<><SectionTitle title="Gallery"/><PhotoBanner {...BANNERS.Gallery}/>
+    <div style={{paddingTop:48,paddingBottom:80}}>
+      {raw.length>0?<><GRow label="PORTRAITS" items={portraits} tall/><GRow label="PERFORMANCE" items={performance}/></>:<EmptyState message="Add photos in Sanity Studio"/>}
+    </div>
+  </>);
 }
  
-/* ═══ NEWS (Sanity connected) ═══ */
+/* ═══ NEWS (Sanity only) ═══ */
 function NewsPage(){
-  const raw = useSanity(`*[_type=="news"]|order(date desc){"id":_id,title,source,date,summary,link,"thumbnailUrl":thumbnail.asset->url}`, FB_NEWS);
+  const raw = useSanity(`*[_type=="news"]|order(date desc){"id":_id,title,source,date,summary,link,"thumbnailUrl":thumbnail.asset->url}`, []);
   const [pg,setPg]=useState(1);const pp=5;const tp=Math.ceil(raw.length/pp);const it=raw.slice((pg-1)*pp,pg*pp);
   return(<><SectionTitle title="News"/><PhotoBanner {...BANNERS.News}/>
     <div style={{maxWidth:1000,margin:"0 auto",padding:"48px 32px 80px"}}>
-      {it.map((n,i)=><div key={n.id}>
+      {it.length>0?<>{it.map((n,i)=><div key={n.id}>
         <div className="nr" style={{display:"flex",gap:40,alignItems:"center",flexDirection:i%2===0?"row":"row-reverse"}}>
-          <div className="ni" style={{width:380,minWidth:380,height:220,borderRadius:4,flexShrink:0,background:n.thumbnailUrl?`url(${n.thumbnailUrl}) center/cover`:`linear-gradient(135deg,hsl(${n.hue||210},14%,20%),hsl(${(n.hue||210)+10},10%,14%))`,border:`1px solid ${C.borderLight}`}}/>
+          <div className="ni" style={{width:380,minWidth:380,height:220,borderRadius:4,flexShrink:0,background:n.thumbnailUrl?`url(${n.thumbnailUrl}) center/cover`:`linear-gradient(135deg,hsl(210,14%,20%),hsl(220,10%,14%))`,border:`1px solid ${C.borderLight}`}}/>
           <div style={{flex:1}}>
             <p style={{fontFamily:F.b,fontSize:12,color:C.dim,margin:"0 0 8px",letterSpacing:1}}>{n.source} &middot; {new Date(n.date).toLocaleDateString("en-US",{year:"numeric",month:"short",day:"numeric"})}</p>
             <h3 style={{fontFamily:F.d,fontSize:24,color:C.text,margin:"0 0 14px",fontWeight:400,lineHeight:1.35}}>{n.title}</h3>
@@ -231,30 +210,26 @@ function NewsPage(){
         </div>
         {i<it.length-1&&<div style={{height:1,background:C.border,margin:"36px 0",opacity:0.3}}/>}
       </div>)}
-      <div style={{display:"flex",justifyContent:"center",gap:8,marginTop:56}}>
+      {tp>1&&<div style={{display:"flex",justifyContent:"center",gap:8,marginTop:56}}>
         {Array.from({length:tp},(_,i)=>i+1).map(p=><button key={p} onClick={()=>setPg(p)} style={{width:40,height:40,borderRadius:4,cursor:"pointer",fontSize:14,fontFamily:F.b,fontWeight:500,transition:"all 0.3s",background:pg===p?`${C.gold}22`:"transparent",border:`1px solid ${pg===p?C.gold:C.border}`,color:pg===p?C.gold:C.muted}}>{p}</button>)}
         {pg<tp&&<button onClick={()=>setPg(pg+1)} style={{width:40,height:40,borderRadius:4,cursor:"pointer",fontSize:14,fontFamily:F.b,background:"transparent",border:`1px solid ${C.border}`,color:C.muted}}>&rarr;</button>}
-      </div>
+      </div>}</>:<EmptyState message="Add news articles in Sanity Studio"/>}
     </div>
     <style>{`@media(max-width:768px){.nr{flex-direction:column!important}.ni{width:100%!important;min-width:0!important;height:220px!important}}`}</style>
   </>);
 }
  
-/* ═══ CONTACT (Formspree + reCAPTCHA) ═══ */
+/* ═══ CONTACT ═══ */
 function ContactPage(){
   const [status,setStatus]=useState("idle");
   const [error,setError]=useState("");
   useEffect(()=>{const id=setTimeout(()=>{if(window.grecaptcha&&document.getElementById("recaptcha-box")){try{window.grecaptcha.render("recaptcha-box",{sitekey:"6Lcj_7QsAAAAAFE42loYCSOULquNbgHgOlxoG5lt",theme:"dark"})}catch(e){}}},1000);return()=>clearTimeout(id)},[]);
- 
   const handleSubmit=async(e)=>{
-    e.preventDefault();
-    setStatus("sending");setError("");
-    try{
-      const res=await fetch("https://formspree.io/f/mnjlaebo",{method:"POST",body:new FormData(e.target),headers:{"Accept":"application/json"}});
-      if(res.ok){setStatus("sent")}else{setStatus("idle");setError("Failed to send. Please try again.")}
-    }catch(err){setStatus("idle");setError("Network error. Please try again.")}
+    e.preventDefault();setStatus("sending");setError("");
+    try{const res=await fetch("https://formspree.io/f/mnjlaebo",{method:"POST",body:new FormData(e.target),headers:{"Accept":"application/json"}});
+      if(res.ok){setStatus("sent")}else{setStatus("idle");setError("Failed to send. Please try again.")}}
+    catch(err){setStatus("idle");setError("Network error. Please try again.")}
   };
- 
   const iS={width:"100%",padding:"14px 18px",background:"transparent",border:`1px solid ${C.border}`,borderRadius:4,color:C.text,fontFamily:F.b,fontSize:15,outline:"none",transition:"border-color 0.3s",boxSizing:"border-box"};
   return(<><SectionTitle title="Contact"/><PhotoBanner {...BANNERS.Contact}/>
     <div style={{maxWidth:1000,margin:"0 auto",padding:"48px 32px 80px"}}>
