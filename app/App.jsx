@@ -55,8 +55,8 @@ function Nav({current,go,scrolled}){
   const [open,setOpen]=useState(false);
   return(
     <nav style={{position:"fixed",top:0,left:0,right:0,zIndex:100,background:scrolled?"rgba(30,30,30,0.92)":"transparent",backdropFilter:scrolled?"blur(16px)":"none",borderBottom:scrolled?`1px solid ${C.border}`:"none",transition:"all 0.5s"}}>
-      <div style={{maxWidth:1200,margin:"0 auto",padding:"0 32px",display:"flex",alignItems:"center",justifyContent:"space-between",height:68}}>
-        <button onClick={()=>go("Home")} style={{background:"none",border:"none",cursor:"pointer",padding:0}}><span style={{fontFamily:F.d,fontSize:20,fontWeight:600,color:C.gold,letterSpacing:3}}>JIN</span></button>
+      <div style={{maxWidth:1400,margin:"0 auto",padding:"0 32px",display:"flex",alignItems:"center",justifyContent:"space-between",height:68}}>
+        <button onClick={()=>go("Home")} style={{background:"none",border:"none",cursor:"pointer",padding:0}}><span style={{fontFamily:F.d,fontSize:26,fontWeight:600,color:C.gold,letterSpacing:4}}>JIN</span></button>
         <div className="dnv" style={{display:"flex",gap:16}}>{PAGES.filter(p=>p!=="Home").map(p=><button key={p} onClick={()=>go(p)} style={{background:current===p?`${C.gold}18`:"none",border:"none",cursor:"pointer",padding:"8px 22px",borderRadius:4,color:current===p?C.gold:C.muted,fontSize:13,fontFamily:F.b,fontWeight:500,letterSpacing:3,textTransform:"uppercase",transition:"all 0.3s"}}>{p}</button>)}</div>
         <button className="mbn" onClick={()=>setOpen(!open)} style={{display:"none",background:"none",border:"none",cursor:"pointer",color:C.gold,fontSize:22,padding:8}}>{open?"\u2715":"\u2630"}</button>
       </div>
@@ -74,7 +74,7 @@ function PhotoBanner({hue,quote}){
 }
  
 function SectionTitle({title}){
-  return(<div style={{padding:"60px 0 0",maxWidth:1000,margin:"0 auto",paddingLeft:32,paddingRight:32}}>
+  return(<div style={{padding:"100px 0 0",maxWidth:1000,margin:"0 auto",paddingLeft:32,paddingRight:32}}>
     <span style={{fontFamily:F.b,fontSize:12,letterSpacing:6,color:C.gold,fontWeight:500,textTransform:"uppercase"}}>{title}</span>
     <div style={{width:40,height:1.5,background:C.gold,marginTop:12,opacity:0.6}}/>
   </div>);
@@ -173,7 +173,7 @@ function GRow({label,items,tall}){
   const mv=e=>{if(!dr)return;e.preventDefault();ref.current.scrollLeft=sl-((e.pageX||e.touches?.[0]?.pageX)-sx)};
   const up=()=>setDr(false);
   return(<div style={{marginBottom:48}}>
-    <div style={{maxWidth:1000,margin:"0 auto",padding:"0 32px"}}><p style={{fontFamily:F.b,fontSize:12,letterSpacing:4,color:C.goldLight,marginBottom:16,fontWeight:500}}>{label}</p></div>
+    <div style={{maxWidth:1000,margin:"0 auto",padding:"0 48px"}}><p style={{fontFamily:F.b,fontSize:12,letterSpacing:4,color:C.goldLight,marginBottom:16,fontWeight:500}}>{label}</p></div>
     <div ref={ref} onMouseDown={dn} onMouseMove={mv} onMouseUp={up} onMouseLeave={up} onTouchStart={dn} onTouchMove={mv} onTouchEnd={up} style={{display:"flex",gap:16,overflowX:"auto",cursor:dr?"grabbing":"grab",scrollbarWidth:"none",userSelect:"none",WebkitUserSelect:"none",paddingLeft:32,paddingRight:32}}>
       {items.map(it=><div key={it.id} onClick={()=>!dr&&setLb(it)} style={{minWidth:tall?220:280,height:tall?300:200,borderRadius:4,flexShrink:0,transition:"transform 0.3s",background:`linear-gradient(135deg,hsl(${it.hue},${it.sat}%,20%),hsl(${it.hue+10},${it.sat-3}%,14%))`,border:`1px solid ${C.borderLight}`}} onMouseEnter={e=>e.currentTarget.style.transform="scale(1.02)"} onMouseLeave={e=>e.currentTarget.style.transform="scale(1)"}/>)}
     </div>
