@@ -96,7 +96,7 @@ function Biography(){
   const bio = useSanity(`*[_type=="biography"][0]{korean,english,"photoUrl":profilePhoto.asset->url}`, null);
   const text = bio ? (lang === "KR" ? bio.korean : bio.english) : null;
   return(<><SectionTitle title="Biography"/><PhotoBanner {...BANNERS.Biography}/>
-    <div style={{maxWidth:1100,margin:"0 auto",padding:"48px 32px 80px"}}>
+    <div style={{maxWidth:1200,margin:"0 auto",padding:"48px 32px 80px"}}>
       <div style={{display:"flex",gap:8,marginBottom:40}}>{["KR","EN"].map(l=><button key={l} onClick={()=>setLang(l)} style={{padding:"10px 24px",borderRadius:4,cursor:"pointer",fontSize:11,fontFamily:F.b,fontWeight:600,letterSpacing:1.5,transition:"all 0.3s",background:lang===l?`${C.gold}22`:"transparent",border:`1px solid ${lang===l?C.gold:C.border}`,color:lang===l?C.gold:C.muted}}>{l==="KR"?"KOREAN":"ENGLISH"}</button>)}</div>
       {text?<div className="bl" style={{display:"flex",gap:80,alignItems:"flex-start"}}>
         <div style={{flex:1}}>{text.split("\n\n").map((p,i)=><p key={`${lang}-${i}`} style={{fontFamily:F.b,fontSize:16,lineHeight:2,color:C.text,margin:"0 0 24px"}}>{p}</p>)}</div>
