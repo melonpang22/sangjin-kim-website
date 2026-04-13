@@ -51,7 +51,7 @@ function PhotoBanner({hue,quote}){
 }
  
 function SectionTitle({title}){
-  return(<div style={{padding:"100px 0 0",maxWidth:1000,margin:"0 auto",paddingLeft:32,paddingRight:32}}>
+  return(<div style={{padding:"120px 0 0",maxWidth:1000,margin:"0 auto",paddingLeft:32,paddingRight:32}}>
     <span style={{fontFamily:F.b,fontSize:12,letterSpacing:6,color:C.gold,fontWeight:500,textTransform:"uppercase"}}>{title}</span>
     <div style={{width:40,height:1.5,background:C.gold,marginTop:12,opacity:0.6}}/>
   </div>);
@@ -100,7 +100,7 @@ function Biography(){
       <div style={{display:"flex",gap:8,marginBottom:40}}>{["KR","EN"].map(l=><button key={l} onClick={()=>setLang(l)} style={{padding:"10px 24px",borderRadius:4,cursor:"pointer",fontSize:11,fontFamily:F.b,fontWeight:600,letterSpacing:1.5,transition:"all 0.3s",background:lang===l?`${C.gold}22`:"transparent",border:`1px solid ${lang===l?C.gold:C.border}`,color:lang===l?C.gold:C.muted}}>{l==="KR"?"KOREAN":"ENGLISH"}</button>)}</div>
       {text?<div className="bl" style={{display:"flex",gap:56,alignItems:"flex-start"}}>
         <div style={{flex:1}}>{text.split("\n\n").map((p,i)=><p key={`${lang}-${i}`} style={{fontFamily:F.b,fontSize:16,lineHeight:2,color:C.text,margin:"0 0 24px"}}>{p}</p>)}</div>
-        <div className="bp" style={{width:420,minWidth:420,height:580,borderRadius:4,background:bio.photoUrl?`url(${bio.photoUrl}) center/cover`:`linear-gradient(160deg,hsl(30,15%,22%),hsl(25,12%,16%))`,border:`1px solid ${C.borderLight}`,position:"sticky",top:100,display:"flex",alignItems:"center",justifyContent:"center"}}>{!bio.photoUrl&&<span style={{fontFamily:F.b,fontSize:12,color:C.dim,letterSpacing:2}}>PROFILE PHOTO</span>}</div>
+        <div className="bp" style={{width:520,minWidth:520,height:720,borderRadius:4,background:bio.photoUrl?`url(${bio.photoUrl}) center/cover`:`linear-gradient(160deg,hsl(30,15%,22%),hsl(25,12%,16%))`,border:`1px solid ${C.borderLight}`,position:"sticky",top:100,display:"flex",alignItems:"center",justifyContent:"center"}}>{!bio.photoUrl&&<span style={{fontFamily:F.b,fontSize:12,color:C.dim,letterSpacing:2}}>PROFILE PHOTO</span>}</div>
       </div>:<EmptyState message="Add biography content in Sanity Studio"/>}
     </div>
     <style>{`@media(max-width:768px){.bl{flex-direction:column-reverse!important}.bp{width:100%!important;min-width:0!important;height:320px!important;position:static!important}}`}</style>
