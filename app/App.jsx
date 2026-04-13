@@ -31,8 +31,8 @@ function useSanity(query, fallback) {
 function Nav({current,go,scrolled}){
   const [open,setOpen]=useState(false);
   return(
-    <nav style={{position:"fixed",top:0,left:0,right:0,zIndex:100,background:scrolled?"rgba(30,30,30,0.92)":"transparent",backdropFilter:scrolled?"blur(16px)":"none",borderBottom:scrolled?`1px solid ${C.border}`:"none",transition:"all 0.5s"}}>
-      <div style={{maxWidth:1400,margin:"0 auto",padding:"0 48px",display:"flex",alignItems:"center",justifyContent:"space-between",height:78}}>
+    <nav style={{position:"fixed",top:12,left:0,right:0,zIndex:100,background:scrolled?"rgba(30,30,30,0.92)":"transparent",backdropFilter:scrolled?"blur(16px)":"none",borderBottom:scrolled?`1px solid ${C.border}`:"none",transition:"all 0.5s"}}>
+      <div style={{maxWidth:1400,margin:"0 auto",padding:"0 48px",display:"flex",alignItems:"center",justifyContent:"space-between",height:88}}>
         <button onClick={()=>go("Home")} style={{background:"none",border:"none",cursor:"pointer",padding:0}}><span style={{fontFamily:F.d,fontSize:26,fontWeight:600,color:C.gold,letterSpacing:4}}>JIN</span></button>
         <div className="dnv" style={{display:"flex",gap:16}}>{PAGES.filter(p=>p!=="Home").map(p=><button key={p} onClick={()=>go(p)} style={{background:current===p?`${C.gold}18`:"none",border:"none",cursor:"pointer",padding:"8px 22px",borderRadius:4,color:current===p?C.gold:C.muted,fontSize:13,fontFamily:F.b,fontWeight:500,letterSpacing:3,textTransform:"uppercase",transition:"all 0.3s"}}>{p}</button>)}</div>
         <button className="mbn" onClick={()=>setOpen(!open)} style={{display:"none",background:"none",border:"none",cursor:"pointer",color:C.gold,fontSize:22,padding:8}}>{open?"\u2715":"\u2630"}</button>
@@ -229,8 +229,9 @@ function NewsPage(){
 function ContactPage(){
   const [status,setStatus]=useState("idle");
   const [error,setError]=useState("");
+  const checkLimit=()=>{const key="contact_"+new Date().toDateString();const count=parseInt(sessionStorage.getItem(key)||"0");if(count>=3)return false;sessionStorage.setItem(key,String(count+1));return true};
   const handleSubmit=async(e)=>{
-    e.preventDefault();setStatus("sending");setError("");
+    e.preventDefault();if(!checkLimit()){setError("Daily limit reached (max 3 messages per day).");return}setStatus("sending");setError("");
     try{const res=await fetch("https://formspree.io/f/mnjlaebo",{method:"POST",body:new FormData(e.target),headers:{"Accept":"application/json"}});
       if(res.ok){setStatus("sent")}else{setStatus("idle");setError("Failed to send. Please try again.")}}
     catch(err){setStatus("idle");setError("Network error. Please try again.")}
