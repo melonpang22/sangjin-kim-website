@@ -210,6 +210,7 @@ function NewsPage(){
 function ContactPage(){
   const [status,setStatus]=useState("idle");
   const [error,setError]=useState("");
+  useEffect(()=>{const id=setTimeout(()=>{if(window.grecaptcha&&document.getElementById("recaptcha-box")){try{window.grecaptcha.render("recaptcha-box",{sitekey:"6Lcj_7QsAAAAAFE42loYCSOULquNbgHgOlxoG5lt",theme:"dark"})}catch(e){}}},1000);return()=>clearTimeout(id)},[]);
  
   const handleSubmit=async(e)=>{
     e.preventDefault();
@@ -238,7 +239,7 @@ function ContactPage(){
         </div>
         <div style={{marginBottom:24}}><label style={{fontFamily:F.b,fontSize:10,color:C.goldLight,letterSpacing:2.5,display:"block",marginBottom:10}}>E-MAIL</label><input name="email" type="email" required style={iS} onFocus={e=>e.target.style.borderColor=C.gold} onBlur={e=>e.target.style.borderColor=C.border}/></div>
         <div style={{marginBottom:24}}><label style={{fontFamily:F.b,fontSize:10,color:C.goldLight,letterSpacing:2.5,display:"block",marginBottom:10}}>MESSAGE</label><textarea name="message" rows={6} required style={{...iS,resize:"vertical"}} onFocus={e=>e.target.style.borderColor=C.gold} onBlur={e=>e.target.style.borderColor=C.border}/></div>
-        <div style={{marginBottom:24}}><div className="g-recaptcha" data-sitekey="6Lcj_7QsAAAAAFE42loYCSOULquNbgHgOlxoG5lt"></div></div>
+        <div id="recaptcha-box" style={{marginBottom:24}}></div>
         {error&&<p style={{fontFamily:F.b,fontSize:13,color:"#E24B4A",marginBottom:16}}>{error}</p>}
         <button type="submit" disabled={status==="sending"} style={{padding:"16px 44px",background:status==="sending"?C.dim:C.gold,border:"none",borderRadius:4,color:C.bg,fontFamily:F.b,fontSize:12,fontWeight:600,letterSpacing:2.5,cursor:status==="sending"?"not-allowed":"pointer",transition:"opacity 0.3s"}} onMouseEnter={e=>{if(status!=="sending")e.currentTarget.style.opacity="0.85"}} onMouseLeave={e=>e.currentTarget.style.opacity="1"}>{status==="sending"?"SENDING...":"SEND MESSAGE"}</button>
       </form>}
@@ -253,10 +254,10 @@ export default function App(){
   const [page,setPage]=useState("Home");
   const [scrolled,setScrolled]=useState(false);
   useEffect(()=>{const h=()=>setScrolled(window.scrollY>40);window.addEventListener("scroll",h);return()=>window.removeEventListener("scroll",h)},[]);
-  useEffect(()=>{const s=document.createElement("script");s.src="https://www.google.com/recaptcha/api.js";s.async=true;s.defer=true;document.head.appendChild(s);return()=>{try{document.head.removeChild(s)}catch(e){}}},[]);
   const go=useCallback(p=>{setPage(p);window.scrollTo(0,0)},[]);
   return(<div style={{background:C.bg,minHeight:"100vh"}}>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+    <script src="https://www.google.com/recaptcha/api.js?render=explicit" async defer></script>
     <Nav current={page} go={go} scrolled={page!=="Home"||scrolled}/>
     {page==="Home"&&<Home/>}
     {page==="Biography"&&<Biography/>}
