@@ -103,7 +103,7 @@ function Biography(){
         <div className="bp" style={{width:520,minWidth:520,height:720,borderRadius:4,background:bio.photoUrl?`url(${bio.photoUrl}) center/cover`:`linear-gradient(160deg,hsl(30,15%,22%),hsl(25,12%,16%))`,border:`1px solid ${C.borderLight}`,position:"sticky",top:100,display:"flex",alignItems:"center",justifyContent:"center"}}>{!bio.photoUrl&&<span style={{fontFamily:F.b,fontSize:12,color:C.dim,letterSpacing:2}}>PROFILE PHOTO</span>}</div>
       </div>:<EmptyState message="Add biography content in Sanity Studio"/>}
     </div>
-    <style>{`@media(max-width:768px){.bl{flex-direction:column-reverse!important}.bp{width:100%!important;min-width:0!important;height:320px!important;position:static!important}}`}</style>
+    <style>{`@media(max-width:768px){.bl{flex-direction:column-reverse!important}.bp{width:100%!important;min-width:0!important;height:auto!important;aspect-ratio:3/4!important;position:static!important}}`}</style>
   </>);
 }
  
