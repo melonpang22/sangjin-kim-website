@@ -268,7 +268,23 @@ export default function App(){
   const [page,setPage]=useState("Home");
   const [scrolled,setScrolled]=useState(false);
   useEffect(()=>{const h=()=>setScrolled(window.scrollY>40);window.addEventListener("scroll",h);return()=>window.removeEventListener("scroll",h)},[]);
-  const go=useCallback(p=>{setPage(p);window.scrollTo(0,0)},[]);
+  useEffect(()=>{
+    const hashToPage=()=>{
+      const hash=window.location.hash.replace("#","").toLowerCase();
+      const match=PAGES.find(p=>p.toLowerCase()===hash);
+      setPage(match||"Home");
+      window.scrollTo(0,0);
+    };
+    hashToPage();
+    window.addEventListener("hashchange",hashToPage);
+    return()=>window.removeEventListener("hashchange",hashToPage);
+  },[]);
+  const go=useCallback(p=>{
+    if(p==="Home"){history.pushState(null,"",window.location.pathname)}
+    else{window.location.hash=p.toLowerCase()}
+    setPage(p);
+    window.scrollTo(0,0);
+  },[]);
   return(<div style={{background:C.bg,minHeight:"100vh"}}>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet"/>
     <Nav current={page} go={go} scrolled={page!=="Home"||scrolled}/>
