@@ -30,7 +30,7 @@ function useSanity(query, fallback) {
  
 function Nav({current,go,scrolled}){
   const [open,setOpen]=useState(false);
-  return(
+  return(<>
     <div style={{position:"fixed",top:0,left:0,right:0,height:"12px",background:"#1E1E1E",zIndex:101}}/><nav style={{position:"fixed",top:12,left:0,right:0,zIndex:100,background:scrolled?"rgba(30,30,30,0.92)":"transparent",backdropFilter:scrolled?"blur(16px)":"none",borderBottom:scrolled?`1px solid ${C.border}`:"none",transition:"all 0.5s"}}>
       <div style={{maxWidth:1400,margin:"0 auto",padding:"0 48px",display:"flex",alignItems:"center",justifyContent:"space-between",height:88}}>
         <button onClick={()=>go("Home")} style={{background:"none",border:"none",cursor:"pointer",padding:0}}><span style={{fontFamily:F.d,fontSize:26,fontWeight:600,color:C.gold,letterSpacing:4}}>JIN</span></button>
@@ -40,7 +40,7 @@ function Nav({current,go,scrolled}){
       {open&&<div style={{background:"rgba(30,30,30,0.98)",padding:"8px 32px 24px",borderTop:`1px solid ${C.border}`}}>{PAGES.map(p=><button key={p} onClick={()=>{go(p);setOpen(false)}} style={{display:"block",width:"100%",textAlign:"left",padding:"14px 0",background:"none",border:"none",cursor:"pointer",color:current===p?C.gold:C.muted,fontSize:14,fontFamily:F.b,fontWeight:500,borderBottom:`1px solid ${C.border}`}}>{p}</button>)}</div>}
       <style>{`@media(max-width:768px){.dnv{display:none!important}.mbn{display:block!important}}`}</style>
     </nav>
-  );
+  </>);
 }
  
 function PhotoBanner({hue,quote}){
