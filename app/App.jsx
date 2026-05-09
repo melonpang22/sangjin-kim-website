@@ -31,7 +31,7 @@ function useSanity(query, fallback) {
 function Nav({current,go,scrolled}){
   const [open,setOpen]=useState(false);
   return(
-    <nav style={{position:"fixed",top:12,left:0,right:0,zIndex:100,background:scrolled?"rgba(30,30,30,0.92)":"transparent",backdropFilter:scrolled?"blur(16px)":"none",borderBottom:scrolled?`1px solid ${C.border}`:"none",transition:"all 0.5s"}}>
+    <div style={{position:"fixed",top:0,left:0,right:0,height:"12px",background:"#1E1E1E",zIndex:101}}/><nav style={{position:"fixed",top:12,left:0,right:0,zIndex:100,background:scrolled?"rgba(30,30,30,0.92)":"transparent",backdropFilter:scrolled?"blur(16px)":"none",borderBottom:scrolled?`1px solid ${C.border}`:"none",transition:"all 0.5s"}}>
       <div style={{maxWidth:1400,margin:"0 auto",padding:"0 48px",display:"flex",alignItems:"center",justifyContent:"space-between",height:88}}>
         <button onClick={()=>go("Home")} style={{background:"none",border:"none",cursor:"pointer",padding:0}}><span style={{fontFamily:F.d,fontSize:26,fontWeight:600,color:C.gold,letterSpacing:4}}>JIN</span></button>
         <div className="dnv" style={{display:"flex",gap:16}}>{PAGES.filter(p=>p!=="Home").map(p=><button key={p} onClick={()=>go(p)} style={{background:current===p?`${C.gold}18`:"none",border:"none",cursor:"pointer",padding:"8px 22px",borderRadius:4,color:current===p?C.gold:C.muted,fontSize:13,fontFamily:F.b,fontWeight:500,letterSpacing:3,textTransform:"uppercase",transition:"all 0.3s"}}>{p}</button>)}</div>
@@ -128,7 +128,7 @@ function SchedulePage(){
             <p style={{fontFamily:F.b,fontSize:13,color:C.dim,margin:"0 0 16px"}}>{s.conductor}{s.director?` / ${s.director}`:""}</p>
             {s.link&&<a href={s.link} target="_blank" rel="noopener noreferrer" style={{fontFamily:F.b,fontSize:11,color:C.gold,letterSpacing:2,textDecoration:"none",border:`1px solid ${C.gold}55`,padding:"8px 20px",borderRadius:3,transition:"all 0.3s",display:"inline-block"}} onMouseEnter={e=>{e.currentTarget.style.background=C.gold;e.currentTarget.style.color=C.bg}} onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.color=C.gold}}>MORE INFO</a>}
           </div>
-          {s.photoUrl&&<div className="sp" style={{width:220,minWidth:220,height:150,borderRadius:4,background:`url(${s.photoUrl}) center/cover`,border:`1px solid ${C.borderLight}`}}/>}
+          {s.photoUrl&&<img className="sp" src={s.photoUrl} alt={s.title} style={{width:220,minWidth:220,height:"auto",borderRadius:4,border:`1px solid ${C.borderLight}`,objectFit:"contain"}}/>}
         </div>
         {i<fl.length-1&&<div style={{height:1,background:C.border,margin:"24px 0 32px",opacity:0.4}}/>}
       </div>):<EmptyState message="Add schedule in Sanity Studio"/>}
