@@ -129,8 +129,8 @@ function ScheduleDetail({s,onClose}){
           <div style={{height:1,background:C.border,margin:"20px 0",opacity:0.5}}/>
           {/* 공연 정보 */}
           <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(180px,1fr))",gap:"12px 32px",marginBottom:28}}>
-            {s.venue&&<div><p style={{fontFamily:F.b,fontSize:11,color:C.dim,letterSpacing:1.5,margin:"0 0 4px",textTransform:"uppercase"}}>Venue</p><p style={{fontFamily:F.b,fontSize:14,color:C.muted,margin:0}}>{s.venue}</p></div>}
-            {s.conductor&&<div><p style={{fontFamily:F.b,fontSize:11,color:C.dim,letterSpacing:1.5,margin:"0 0 4px",textTransform:"uppercase"}}>Conductor</p><p style={{fontFamily:F.b,fontSize:14,color:C.muted,margin:0}}>{s.conductor}</p></div>}
+            {s.venue&&<div><p style={{fontFamily:F.b,fontSize:11,color:C.dim,letterSpacing:1.5,margin:"0 0 4px",textTransform:"uppercase"}}>Performer</p><p style={{fontFamily:F.b,fontSize:14,color:C.muted,margin:0}}>{s.venue}</p></div>}
+            {s.conductor&&<div style={{gridColumn:"1/-1"}}><p style={{fontFamily:F.b,fontSize:11,color:C.dim,letterSpacing:1.5,margin:"0 0 4px",textTransform:"uppercase"}}>Information</p><p style={{fontFamily:F.b,fontSize:14,color:C.muted,margin:0,lineHeight:1.6}}>{s.conductor}</p></div>}
             {s.director&&<div><p style={{fontFamily:F.b,fontSize:11,color:C.dim,letterSpacing:1.5,margin:"0 0 4px",textTransform:"uppercase"}}>Director</p><p style={{fontFamily:F.b,fontSize:14,color:C.muted,margin:0}}>{s.director}</p></div>}
           </div>
           {/* 사진 슬라이더 */}
