@@ -107,10 +107,61 @@ function Biography(){
   </>);
 }
  
+function ScheduleDetail({s,onClose}){
+  const [imgIdx,setImgIdx]=useState(0);
+  const imgs=s.detailImages&&s.detailImages.length>0?s.detailImages:(s.photoUrl?[s.photoUrl]:[]);
+  useEffect(()=>{
+    const esc=e=>{if(e.key==="Escape")onClose()};
+    document.addEventListener("keydown",esc);
+    document.body.style.overflow="hidden";
+    return()=>{document.removeEventListener("keydown",esc);document.body.style.overflow=""};
+  },[onClose]);
+  return(
+    <div onClick={onClose} style={{position:"fixed",inset:0,zIndex:200,background:"rgba(15,15,15,0.88)",backdropFilter:"blur(6px)",display:"flex",alignItems:"center",justifyContent:"center",padding:"20px"}}>
+      <div onClick={e=>e.stopPropagation()} style={{background:C.surface,borderRadius:8,border:`1px solid ${C.border}`,maxWidth:800,width:"100%",maxHeight:"90vh",overflowY:"auto",position:"relative"}}>
+        {/* 닫기 버튼 */}
+        <button onClick={onClose} style={{position:"sticky",top:0,float:"right",margin:"16px 16px 0 0",background:"none",border:"none",cursor:"pointer",color:C.muted,fontSize:22,lineHeight:1,zIndex:10}}>✕</button>
+        <div style={{padding:"40px 48px 48px",clear:"both"}}>
+          {/* 헤더 */}
+          <p style={{fontFamily:F.b,fontSize:12,color:C.gold,letterSpacing:2,margin:"0 0 12px",textTransform:"uppercase"}}>{s.date}</p>
+          <h2 style={{fontFamily:F.d,fontSize:"clamp(22px,3vw,34px)",color:C.text,margin:"0 0 8px",fontWeight:400,fontStyle:"italic",lineHeight:1.25}}>{s.title}</h2>
+          {s.role&&<p style={{fontFamily:F.b,fontSize:14,color:C.goldLight,margin:"0 0 16px",letterSpacing:0.5}}>{s.role}</p>}
+          <div style={{height:1,background:C.border,margin:"20px 0",opacity:0.5}}/>
+          {/* 공연 정보 */}
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(180px,1fr))",gap:"12px 32px",marginBottom:28}}>
+            {s.venue&&<div><p style={{fontFamily:F.b,fontSize:11,color:C.dim,letterSpacing:1.5,margin:"0 0 4px",textTransform:"uppercase"}}>Venue</p><p style={{fontFamily:F.b,fontSize:14,color:C.muted,margin:0}}>{s.venue}</p></div>}
+            {s.conductor&&<div><p style={{fontFamily:F.b,fontSize:11,color:C.dim,letterSpacing:1.5,margin:"0 0 4px",textTransform:"uppercase"}}>Conductor</p><p style={{fontFamily:F.b,fontSize:14,color:C.muted,margin:0}}>{s.conductor}</p></div>}
+            {s.director&&<div><p style={{fontFamily:F.b,fontSize:11,color:C.dim,letterSpacing:1.5,margin:"0 0 4px",textTransform:"uppercase"}}>Director</p><p style={{fontFamily:F.b,fontSize:14,color:C.muted,margin:0}}>{s.director}</p></div>}
+          </div>
+          {/* 사진 슬라이더 */}
+          {imgs.length>0&&<div style={{marginBottom:28}}>
+            <div style={{position:"relative",borderRadius:6,overflow:"hidden",background:C.bg,aspectRatio:"16/9",display:"flex",alignItems:"center",justifyContent:"center"}}>
+              <img src={imgs[imgIdx]} alt={s.title} style={{maxWidth:"100%",maxHeight:"100%",objectFit:"contain"}}/>
+              {imgs.length>1&&<>
+                <button onClick={()=>setImgIdx(p=>(p-1+imgs.length)%imgs.length)} style={{position:"absolute",left:12,top:"50%",transform:"translateY(-50%)",background:"rgba(30,30,30,0.7)",border:`1px solid ${C.border}`,borderRadius:"50%",width:36,height:36,cursor:"pointer",color:C.gold,fontSize:16,display:"flex",alignItems:"center",justifyContent:"center"}}>‹</button>
+                <button onClick={()=>setImgIdx(p=>(p+1)%imgs.length)} style={{position:"absolute",right:12,top:"50%",transform:"translateY(-50%)",background:"rgba(30,30,30,0.7)",border:`1px solid ${C.border}`,borderRadius:"50%",width:36,height:36,cursor:"pointer",color:C.gold,fontSize:16,display:"flex",alignItems:"center",justifyContent:"center"}}>›</button>
+                <div style={{position:"absolute",bottom:10,left:"50%",transform:"translateX(-50%)",display:"flex",gap:6}}>{imgs.map((_,i)=><span key={i} onClick={()=>setImgIdx(i)} style={{width:6,height:6,borderRadius:"50%",background:i===imgIdx?C.gold:C.border,cursor:"pointer",transition:"background 0.2s"}}/>)}</div>
+              </>}
+            </div>
+          </div>}
+          {/* 본문 설명 */}
+          {s.description&&<div style={{marginBottom:32}}><p style={{fontFamily:F.b,fontSize:14,color:C.muted,lineHeight:1.8,margin:0,whiteSpace:"pre-wrap"}}>{s.description}</p></div>}
+          {/* 버튼 영역 */}
+          <div style={{display:"flex",gap:12,flexWrap:"wrap"}}>
+            {s.link&&<a href={s.link} target="_blank" rel="noopener noreferrer" style={{fontFamily:F.b,fontSize:11,color:C.gold,letterSpacing:2,textDecoration:"none",border:`1px solid ${C.gold}55`,padding:"10px 24px",borderRadius:3,transition:"all 0.3s",display:"inline-block",textTransform:"uppercase"}} onMouseEnter={e=>{e.currentTarget.style.background=C.gold;e.currentTarget.style.color=C.bg}} onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.color=C.gold}}>More Info</a>}
+            {s.ticketLink&&<a href={s.ticketLink} target="_blank" rel="noopener noreferrer" style={{fontFamily:F.b,fontSize:11,color:C.bg,letterSpacing:2,textDecoration:"none",background:C.gold,border:`1px solid ${C.gold}`,padding:"10px 24px",borderRadius:3,transition:"all 0.3s",display:"inline-block",textTransform:"uppercase"}} onMouseEnter={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.color=C.gold}} onMouseLeave={e=>{e.currentTarget.style.background=C.gold;e.currentTarget.style.color=C.bg}}>🎫 Reserve Tickets</a>}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function SchedulePage(){
-  const raw = useSanity(`*[_type=="schedule"]|order(year desc, date desc){"id":_id,year,date,title,role,venue,conductor,director,link,"photoUrl":photo.asset->url}`, []);
+  const raw = useSanity(`*[_type=="schedule"]|order(year desc, date desc){"id":_id,year,date,title,role,venue,conductor,director,link,ticketLink,description,"photoUrl":photo.asset->url,"detailImages":detailImages[].asset->url}`, []);
   const yrs=[...new Set(raw.map(s=>s.year))].sort((a,b)=>b-a);
   const [yr,setYr]=useState(null);
+  const [detail,setDetail]=useState(null);
   useEffect(()=>{if(yrs.length>0&&yr===null)setYr(yrs[0])},[yrs,yr]);
   const fl=raw.filter(s=>s.year===(yr||yrs[0]));
   return(<><SectionTitle title="Schedule"/><PhotoBanner {...BANNERS.Schedule}/>
@@ -126,13 +177,17 @@ function SchedulePage(){
             {s.role&&<p style={{fontFamily:F.b,fontSize:14,color:C.goldLight,margin:"0 0 8px"}}>{s.role}</p>}
             <p style={{fontFamily:F.b,fontSize:14,color:C.muted,margin:"0 0 4px"}}>{s.venue}</p>
             <p style={{fontFamily:F.b,fontSize:13,color:C.dim,margin:"0 0 16px"}}>{s.conductor}{s.director?` / ${s.director}`:""}</p>
-            {s.link&&<a href={s.link} target="_blank" rel="noopener noreferrer" style={{fontFamily:F.b,fontSize:11,color:C.gold,letterSpacing:2,textDecoration:"none",border:`1px solid ${C.gold}55`,padding:"8px 20px",borderRadius:3,transition:"all 0.3s",display:"inline-block"}} onMouseEnter={e=>{e.currentTarget.style.background=C.gold;e.currentTarget.style.color=C.bg}} onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.color=C.gold}}>MORE INFO</a>}
+            <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
+              <button onClick={()=>setDetail(s)} style={{fontFamily:F.b,fontSize:11,color:C.gold,letterSpacing:2,background:"transparent",border:`1px solid ${C.gold}55`,padding:"8px 20px",borderRadius:3,cursor:"pointer",transition:"all 0.3s",textTransform:"uppercase"}} onMouseEnter={e=>{e.currentTarget.style.background=C.gold;e.currentTarget.style.color=C.bg}} onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.color=C.gold}}>More Info</button>
+              {s.ticketLink&&<a href={s.ticketLink} target="_blank" rel="noopener noreferrer" style={{fontFamily:F.b,fontSize:11,color:C.bg,letterSpacing:2,textDecoration:"none",background:C.gold,border:`1px solid ${C.gold}`,padding:"8px 20px",borderRadius:3,transition:"all 0.3s",display:"inline-block",textTransform:"uppercase"}} onMouseEnter={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.color=C.gold}} onMouseLeave={e=>{e.currentTarget.style.background=C.gold;e.currentTarget.style.color=C.bg}}>🎫 Reserve</a>}
+            </div>
           </div>
           {s.photoUrl&&<img className="sp" src={s.photoUrl} alt={s.title} style={{width:220,minWidth:220,height:"auto",borderRadius:4,border:`1px solid ${C.borderLight}`,objectFit:"contain"}}/>}
         </div>
         {i<fl.length-1&&<div style={{height:1,background:C.border,margin:"24px 0 32px",opacity:0.4}}/>}
       </div>):<EmptyState message="Add schedule in Sanity Studio"/>}
     </div>
+    {detail&&<ScheduleDetail s={detail} onClose={()=>setDetail(null)}/>}
     <style>{`@media(max-width:768px){.sr{flex-direction:column!important}.sp{width:100%!important;min-width:0!important;height:200px!important}}`}</style>
   </>);
 }
