@@ -148,7 +148,6 @@ function ScheduleDetail({s,onClose}){
           {s.description&&<div style={{marginBottom:32}}><p style={{fontFamily:F.b,fontSize:14,color:C.muted,lineHeight:1.8,margin:0,whiteSpace:"pre-wrap"}}>{s.description}</p></div>}
           {/* 버튼 영역 */}
           <div style={{display:"flex",gap:12,flexWrap:"wrap"}}>
-            {s.link&&<a href={s.link} target="_blank" rel="noopener noreferrer" style={{fontFamily:F.b,fontSize:11,color:C.gold,letterSpacing:2,textDecoration:"none",border:`1px solid ${C.gold}55`,padding:"10px 24px",borderRadius:3,transition:"all 0.3s",display:"inline-block",textTransform:"uppercase"}} onMouseEnter={e=>{e.currentTarget.style.background=C.gold;e.currentTarget.style.color=C.bg}} onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.color=C.gold}}>More Info</a>}
             {s.ticketLink&&<a href={s.ticketLink} target="_blank" rel="noopener noreferrer" style={{fontFamily:F.b,fontSize:11,color:C.bg,letterSpacing:2,textDecoration:"none",background:C.gold,border:`1px solid ${C.gold}`,padding:"10px 24px",borderRadius:3,transition:"all 0.3s",display:"inline-block",textTransform:"uppercase"}} onMouseEnter={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.color=C.gold}} onMouseLeave={e=>{e.currentTarget.style.background=C.gold;e.currentTarget.style.color=C.bg}}>🎫 Reserve Tickets</a>}
           </div>
         </div>
